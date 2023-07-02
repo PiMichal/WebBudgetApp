@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Auth;
 use \Core\View;
 
 /**
@@ -9,7 +10,7 @@ use \Core\View;
  *
  * PHP version 7.0
  */
-class Home extends \Core\Controller
+class Home extends Authenticated
 {
 
     /**
@@ -19,6 +20,12 @@ class Home extends \Core\Controller
      */
     public function indexAction()
     {
-        View::renderTemplate('Home/index.html');
+        
+        View::renderTemplate('Home/index.html', [
+            'user' => Auth::getUser()
+        ]);
+
     }
+
+
 }
