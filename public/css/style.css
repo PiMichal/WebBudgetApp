@@ -4,23 +4,6 @@
     box-sizing: border-box;
 }
 
-.alert {
-    border: 1px solid #ccc;
-    padding: 6px;
-}
-
-.alert-info{
-    background-color: #d9edf7;
-}
-
-.alert-success{
-    background-color: #dff0d8;
-}
-
-.alert-warning{
-    background-color: #fcf8e3;
-}
-
 .loginPage{
 	background: linear-gradient(-45deg, #ee7752, #23a6d5, #23d5ab);
 	background-size: 400% 400%;
