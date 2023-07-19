@@ -4,7 +4,7 @@ namespace App\Controllers;
 
 use App\Auth;
 use \Core\View;
-
+use App\Models\User;
 /**
  * Home controller
  *
@@ -20,7 +20,7 @@ class Home extends Authenticated
      */
     public function indexAction()
     {
-        
+
         View::renderTemplate('Home/index.html', [
             'user' => Auth::getUser()
         ]);

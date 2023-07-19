@@ -14,17 +14,59 @@ use Core\View;
  */
 class User extends \Core\Model
 {
+    /**
+     * User ID
+     * @var integer
+     */
 
     public $id;
+
+    /**
+     * User Login
+     * @var string
+     */
     public $username;
+
+    /**
+     * User Email
+     * @var string
+     */
     public $email;
+
+    /**
+     * User password
+     * @var string
+     */
     public $password;
+
+    /**
+     * User password confirmation
+     * @var string
+     */
     public $password_confirmation;
-    
+
+    /**
+     * Token
+     * @var string
+     */
     public $remember_token;
+
+    /**
+     * reset hash
+     * @var string
+     */
     public $password_reset_hash;
+
+    /**
+     * reset expires hash
+     * @var string
+     */
     public $password_reset_expires_at;
 
+    /**
+     * reset token
+     * @var string
+     */
     public $password_reset_token;
 
     /**
@@ -32,7 +74,7 @@ class User extends \Core\Model
      * @var string
      */
 
-     public $expiry_timestamp;
+    public $expiry_timestamp;
 
 
     /**
@@ -65,22 +107,21 @@ class User extends \Core\Model
     {
         $this->validate();
 
-        if (empty($this->errors)){
+        if (empty($this->errors)) {
 
             $password = password_hash($this->password, PASSWORD_DEFAULT);
 
             $sql = 'INSERT INTO users (username, password, email)
             VALUES (:username, :password, :email)';
-    
+
             $db = static::getDB();
             $stmt = $db->prepare($sql);
-    
+
             $stmt->bindValue('username', $this->username, PDO::PARAM_STR);
             $stmt->bindValue('password', $password, PDO::PARAM_STR);
             $stmt->bindValue('email', $this->email, PDO::PARAM_STR);
-    
-            return $stmt->execute();
 
+            return $stmt->execute();
         }
         return false;
     }
@@ -95,7 +136,7 @@ class User extends \Core\Model
         if ($this->username == '') {
             $this->errors[] = 'Name is required';
         }
- 
+
         // email address
         if (filter_var($this->email, FILTER_VALIDATE_EMAIL) === false) {
             $this->errors[] = 'Invalid email';
@@ -103,25 +144,25 @@ class User extends \Core\Model
         if (static::emailExists($this->email, $this->id ?? null)) {
             $this->errors[] = 'email already taken';
         }
- 
+
         // Password
         if ($this->password != $this->password_confirmation) {
             $this->errors[] = 'Password must match confirmation';
         }
- 
+
         if (strlen($this->password) < 6) {
             $this->errors[] = 'Please enter at least 6 characters for the password';
         }
- 
+
         if (preg_match('/.*[a-z]+.*/i', $this->password) == 0) {
             $this->errors[] = 'Password needs at least one letter';
         }
- 
+
         if (preg_match('/.*\d+.*/i', $this->password) == 0) {
             $this->errors[] = 'Password needs at least one number';
         }
     }
-    
+
     /**
      * See if a user record already exists with the specified email
      * 
@@ -142,7 +183,7 @@ class User extends \Core\Model
 
         return false;
     }
-
+    
     /**
      * Find a user model by email address
      * 
@@ -183,7 +224,7 @@ class User extends \Core\Model
                 return $username;
             }
         }
-        
+
         return false;
     }
 
@@ -252,11 +293,9 @@ class User extends \Core\Model
         if ($username) {
 
             if ($username->startPasswordReset()) {
-                
+
                 $username->sendPasswordResetEmail();
-
             }
-
         }
     }
 
@@ -337,7 +376,6 @@ class User extends \Core\Model
                 return $user;
             }
         }
-
     }
 
     /**
@@ -381,4 +419,3 @@ class User extends \Core\Model
         return false;
     }
 }
-

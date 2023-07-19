@@ -3,6 +3,8 @@
 namespace App\Controllers;
 
 use Core\View;
+use App\Models\IncomeAndExpenses;
+use App\Flash;
 
 /**
  * Income controller
@@ -20,5 +22,28 @@ class Income extends Authenticated
     public function newAction()
     {
         View::renderTemplate('Income/new.html');
+    }
+
+        /**
+     * Adding income
+     * 
+     * @return void
+     */
+    public function addAction()
+    {   
+        $income = new IncomeAndExpenses($_POST);
+
+        if ($income->saveIncome()) {
+            Flash::addMessage('Income added');
+            View::renderTemplate('Home/index.html');
+
+        } else {
+
+            View::renderTemplate('Income/new.html', [
+                'income' => $income
+            ]);
+            
+        }
+
     }
 }
