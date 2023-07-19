@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Expenses{% endblock %}
+
+{% block body %}
+
+<body class="canva">
+
+    <header>
+        <nav>
+            <div class="navbar navbar-expand-lg navbar-dark">
+                <div class="container-fluid">
+
+                    <p class="offcanvas-title fw-bold"><i class="bi bi-bank"></i> Budget app</p>
+
+                    <a class="navbar-toggler" href="#offcanvasExample" data-bs-toggle="offcanvas"
+                        aria-controls="offcanvasExample">
+                        <span class="navbar-toggler-icon"></span>
+                    </a>
+
+                    <div class="offcanvas offcanvas-start text-bg-dark" tabindex="-1" id="offcanvasExample"
+                        aria-labelledby="offcanvasExample">
+                        <div class="offcanvas-header">
+                            <p class="offcanvas-title"><i class="bi bi-bank"></i> Budget app</p>
+                        </div>
+                        <div class="offcanvas-body">
+                            <ul class="navbar-nav nav-pills nav-tabs m-auto mb-2 mb-lg-0">
+                                <li class="nav-item">
+                                    <a class="nav-link px-3" href="/home/index"><i class="bi bi-house"></i> Home</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link px-3" href="/income/new"><i class="bi bi-plus-square"></i> Add
+                                        income</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link active px-3" href="/expenses/new"><i
+                                            class="bi bi-dash-square"></i> Add expenses</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link px-3" href="./balance.html"><i class="bi bi-clipboard-data"></i>
+                                        Balance</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link px-3" href="./settings.html"><i class="bi bi-gear-fill"></i>
+                                        Settings</a>
+                                </li>
+                            </ul>
+                            <form class="d-flex">
+                                <button class="btn btn-success px-3" type="submit" formaction="/logout">Logout</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+    </header>
+    <main class="container py-5">
+        <form class="was-validated bd-example text-white">
+            <h3>Add Expenses</h3>
+            <hr>
+            <div class="mb-3">
+                <label for="validationTextarea" class="form-label">Amount</label>
+                <input type="number" step="0.5" class="form-control" id="validationTextarea" placeholder="0,00"
+                    required="">
+                <div class="invalid-feedback">
+                    Please enter a amount.
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="validationTextarea" class="form-label">Date</label>
+                <input type="date" class="form-control" id="validationTextarea1" required="">
+                <div class="invalid-feedback">
+                    Please enter a date.
+                </div>
+            </div>
+
+            <label for="validationTextarea" class="form-label mb-3">Payment method</label>
+
+            <select class="form-select">
+                <option selected value="1">Cash</option>
+                <option  value="2">Debit card</option>
+                <option  value="3">Credit card</option>
+            </select>
+
+            <label for="validationTextarea" class="form-label my-3">Category</label>
+
+            <select class="form-select">
+                <option selected value="1">Food</option>
+                <option value="2">Apartment</option>
+                <option value="3">Transport</option>
+                <option value="4">Telecommunications</option>
+                <option value="5">Health care</option>
+                <option value="6">Clothes</option>
+                <option value="7">Hygiene</option>
+                <option value="8">Kids</option>
+                <option value="9">Transport</option>
+                <option value="10">Entertainment</option>
+                <option value="11">Trip</option>
+                <option value="12">Training</option>
+                <option value="13">Books</option>
+                <option value="14">Savings</option>
+                <option value="15">Into golden autumn</option>
+                <option value="16">Repayment of debts</option>
+                <option value="17">Donation</option>
+                <option value="18">Other</option>
+            </select>
+
+            <div class="my-3">
+                <label for="validationTextarea" class="form-label">Comment (optional)</label>
+                <input type="text" class="form-control" style="border: 0; background-image: none; box-shadow: none;"
+                    id="validationTextarea2" placeholder="eg. sale of bicycles">
+            </div>
+
+            <div class="mb-3">
+                <button class="btn btn-danger col-md-4" type="submit">Cancel</button>
+                <button class="btn btn-success col-md-4 mx-3" type="submit">Add</button>
+            </div>
+        </form>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+        crossorigin="anonymous"></script>
+
+</body>
+
+
+
+
+
+
+{% endblock %}

@@ -10,7 +10,7 @@ use PDO;
  * PHP version 7.0
  */
 
-class IncomeAndExpenses extends \Core\Model
+class UserIncome extends \Core\Model
 {
    public $user_id;
    /**
