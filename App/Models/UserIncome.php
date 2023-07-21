@@ -80,6 +80,11 @@ class UserIncome extends \Core\Model
       $stmt->execute();
    }
 
+   /**
+    * Assign the appropriate number to the name and return the value
+    *
+    * @return int
+    */
    public function findCategory()
    {
       $user = Auth::getUser();
@@ -103,7 +108,9 @@ class UserIncome extends \Core\Model
    }
 
    /**
-    * 
+    * Saving the entered incomes in the database
+    *
+    * @return array
     */
    public function saveIncome()
    {
