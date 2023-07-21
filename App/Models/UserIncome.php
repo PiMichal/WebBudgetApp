@@ -10,7 +10,7 @@ use PDO;
  * PHP version 7.0
  */
 
-class IncomeAndExpenses extends \Core\Model
+class UserIncome extends \Core\Model
 {
    public $user_id;
    /**
@@ -80,6 +80,11 @@ class IncomeAndExpenses extends \Core\Model
       $stmt->execute();
    }
 
+   /**
+    * Assign the appropriate number to the name and return the value
+    *
+    * @return int
+    */
    public function findCategory()
    {
       $user = Auth::getUser();
@@ -103,7 +108,9 @@ class IncomeAndExpenses extends \Core\Model
    }
 
    /**
-    * 
+    * Saving the entered incomes in the database
+    *
+    * @return array
     */
    public function saveIncome()
    {

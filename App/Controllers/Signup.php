@@ -3,7 +3,8 @@
 namespace App\Controllers;
 
 use App\Models\User;
-use App\Models\IncomeAndExpenses;
+use App\Models\UserExpense;
+use App\Models\UserIncome;
 use \Core\View;
 /**
  * Signup controller
@@ -36,7 +37,8 @@ class Signup extends \Core\Controller
         
         if ($user->save()){
             
-            IncomeAndExpenses::createDefault($_POST['email']);
+            UserIncome::createDefault($_POST['email']);
+            UserExpense::createDefault($_POST['email']);
 
             $this->redirect('/signup/success');
 

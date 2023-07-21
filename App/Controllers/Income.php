@@ -3,7 +3,7 @@
 namespace App\Controllers;
 
 use Core\View;
-use App\Models\IncomeAndExpenses;
+use App\Models\UserIncome;
 use App\Flash;
 
 /**
@@ -31,7 +31,7 @@ class Income extends Authenticated
      */
     public function addAction()
     {   
-        $income = new IncomeAndExpenses($_POST);
+        $income = new UserIncome($_POST);
 
         if ($income->saveIncome()) {
             Flash::addMessage('Income added');
