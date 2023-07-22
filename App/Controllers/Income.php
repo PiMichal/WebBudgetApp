@@ -24,7 +24,7 @@ class Income extends Authenticated
         View::renderTemplate('Income/new.html');
     }
 
-        /**
+    /**
      * Adding income
      * 
      * @return void
