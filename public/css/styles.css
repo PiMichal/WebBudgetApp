@@ -88,21 +88,7 @@ h3{
 	background: rgba(44, 204, 44, 0.3)
 }
 
-.table1{
-	float: left;
+.table-responsive {
+    max-height: 400px;
 }
-
-.table2{
-	float: right;
-}
-
-@media (max-width: 576px) {
-
-	.table1, .table2{
-        clear: both;
-        width: 100%;
-	}
-}
-
-
 
