@@ -31,6 +31,7 @@ class Income extends Authenticated
      */
     public function addAction()
     {   
+
         $income = new UserIncome($_POST);
 
         if ($income->saveIncome()) {

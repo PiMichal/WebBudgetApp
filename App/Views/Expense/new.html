@@ -5,43 +5,45 @@
 
 {% block footer %}
 
-	<script>
+<script>
 
-		var text_max = 100;
-$('#count_message').html('0 / ' + text_max);
+	var text_max = 100;
+	$('#count_message').html('0 / ' + text_max);
 
-$('#text').keyup(function () {
-var text_length = $('#text').val().length;
-var text_remaining = text_max - text_length;
+	$('#text').keyup(function () {
+		var text_length = $('#text').val().length;
+		var text_remaining = text_max - text_length;
 
-$('#count_message').html(text_length + ' / ' + text_max);
-});
+		$('#count_message').html(text_length + ' / ' + text_max);
+	});
 
-$(document).ready(function () { /**
+	$(document).ready(function () { /**
      * Validate the form
      */
-$("#cancel").click(function () {
-document.getElementById("inputAmount").required = false;
-document.getElementById("inputDate").required = false;
-})
+		$("#cancel").click(function () {
+			document.getElementById("inputAmount").required = false;
+			document.getElementById("inputDate").required = false;
+		})
 
-$("#formExpenses").validate({
-rules: {
-income_comment: {
-maxlength: 100
-}
-},
+		$("#formExpenses").validate({
+			rules: {
+				income_comment: {
+					maxlength: 100
+				}
+			},
 
-highlight: function (element, errorClass, validClass) {
-$(element).addClass("is-invalid").removeClass("is-valid");
-},
-unhighlight: function (element, errorClass, validClass) {
-$(element).addClass("is-valid").removeClass("is-invalid");
-}
+			highlight: function (element, errorClass, validClass) {
+				$(element).addClass("is-invalid").removeClass("is-valid");
+			},
+			unhighlight: function (element, errorClass, validClass) {
+				$(element).addClass("is-valid").removeClass("is-invalid");
+			}
 
-});
-});
-	</script>
+		});
+	});
+</script>
+
+
 
 {% endblock %}
 
@@ -133,8 +135,8 @@ $(element).addClass("is-valid").removeClass("is-invalid");
 											Settings</a>
 									</li>
 								</ul>
-								<form class="d-flex">
-									<button class="btn btn-success px-3" type="submit" formaction="/logout">Logout</button>
+								<form class="d-flex" action="/logout">
+									<button class="btn btn-success px-3" type="submit">Logout</button>
 								</form>
 							</div>
 						</div>
