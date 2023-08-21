@@ -2,7 +2,43 @@
 
 {% block title %}Balance {% endblock %} 
 
-{% block footer %}
+{% block body %}
+
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+      google.charts.load("current", {packages:["corechart"]});
+      google.charts.setOnLoadCallback(drawChart);
+      
+      function drawChart() {
+
+        
+        var data = new google.visualization.arrayToDataTable(
+          
+          [
+          ['Category', 'Amount'],
+          {% for info in expenseData %}
+          ['{{ info.expense_name }}', {{ info.expense_amount }}],
+          {% endfor %}
+        ]
+        );
+        
+
+        var options = {
+          backgroundColor: 'transparent',
+          chartArea: {width: '900', height: '500'},
+          legend: {position: 'right',
+          textStyle: {color: 'white',
+          fontSize:15}
+          
+          },
+          is3D: true
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('piechart_3d'));
+        chart.draw(data, options);
+      }
+</script>
 
 
 <script>
@@ -21,37 +57,9 @@
       }
 
     });
-
-    google.charts.load('visualization', "1", {
-				packages: ['corechart']
-			});
-			google.charts.setOnLoadCallback(drawBarChart);
-			
-			// Pie Chart
-			google.charts.setOnLoadCallback(showBarChart);
-			function drawBarChart() {
-				var data = google.visualization.arrayToDataTable([
-					['Day', 'Products Count'], 
-
-				]);
-				var options = {
-					title: ' Pie chart data',
-					is3D: true,
-				};
-				var chart = new google.visualization.PieChart(document.getElementById('GooglePieChart'));
-				chart.draw(data, options);
-			}
-
-
-
   });
 
 </script>
-
-{% endblock %}
-
-
-{% block body %}
 
 <body class="canva">
   <header>
@@ -216,7 +224,7 @@
 
     </div>
 
-    <div class="table-responsive my-5">
+    <div class="table-responsive">
       <table id="dtVerticalScrollExample"
         class="table table-sm table-dark table-hover table-bordered text-white text-center caption-top">
         <caption class="text-white">
@@ -263,18 +271,23 @@
       </table>
     </div>
 
-    <div class="text-center" style="clear: both">
+    <div class="text-center">
       <h5 class="fw-bold bg-dark">
         <hr />
-        Balance: <span class="text-warning">{{ calculatedBalance }} $</span>
+        Balance: <span class="text-warning"> {{ calculatedBalance }} $</span>
         <hr />
       </h5>
+      <div id="chart_wrap" class="d-flex justify-content-center">
+        <div id="piechart_3d"></div>
+      </div>
       <h5 class="bg-dark">
         <hr />
-        {% if calculatedBalance >= 0 %}
+        {% if countTotalIncome > countTotalExpense %}
         <span class="text-success">Congratulations! You are managing your finances brilliantly</span>
-        {% else %}
+        {% elseif countTotalIncome < countTotalExpense %}
         <span class="text-danger">Note: In the selected period, expenses are higher than income!</span>
+        {% else %}
+        <span></span>
         {% endif %}
         <hr />
       </h5>

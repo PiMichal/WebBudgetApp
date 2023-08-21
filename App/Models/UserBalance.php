@@ -41,8 +41,8 @@ class UserBalance extends \Core\Model
             $stmt->bindValue(':endDate', $this->end_date, PDO::PARAM_STR);
             
             $stmt->execute();
-    
-            $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $data = $stmt->fetchAll();
 
             return $data;
         }
@@ -105,11 +105,11 @@ class UserBalance extends \Core\Model
            
            $stmt->execute();
    
-           $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+           $data = $stmt->fetchAll();
 
            return $data;
        }
-
+       
        return false;
 
    }

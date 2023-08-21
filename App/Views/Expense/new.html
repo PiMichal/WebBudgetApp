@@ -1,51 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}Expenses
-{% endblock %}
+{% block title %}Expenses {% endblock %}
 
-{% block footer %}
-
-<script>
-
-	var text_max = 100;
-	$('#count_message').html('0 / ' + text_max);
-
-	$('#text').keyup(function () {
-		var text_length = $('#text').val().length;
-		var text_remaining = text_max - text_length;
-
-		$('#count_message').html(text_length + ' / ' + text_max);
-	});
-
-	$(document).ready(function () { /**
-     * Validate the form
-     */
-		$("#cancel").click(function () {
-			document.getElementById("inputAmount").required = false;
-			document.getElementById("inputDate").required = false;
-		})
-
-		$("#formExpenses").validate({
-			rules: {
-				income_comment: {
-					maxlength: 100
-				}
-			},
-
-			highlight: function (element, errorClass, validClass) {
-				$(element).addClass("is-invalid").removeClass("is-valid");
-			},
-			unhighlight: function (element, errorClass, validClass) {
-				$(element).addClass("is-valid").removeClass("is-invalid");
-			}
-
-		});
-	});
-</script>
-
-
-
-{% endblock %}
 
 {% block body %}
 
@@ -208,5 +164,49 @@
 			</form>
 		</main>
 	</body>
+
+{% endblock %}
+
+{% block footer %}
+
+<script>
+
+	var text_max = 100;
+	$('#count_message').html('0 / ' + text_max);
+
+	$('#text').keyup(function () {
+		var text_length = $('#text').val().length;
+		var text_remaining = text_max - text_length;
+
+		$('#count_message').html(text_length + ' / ' + text_max);
+	});
+
+	$(document).ready(function () { /**
+     * Validate the form
+     */
+		$("#cancel").click(function () {
+			document.getElementById("inputAmount").required = false;
+			document.getElementById("inputDate").required = false;
+		})
+
+		$("#formExpenses").validate({
+			rules: {
+				income_comment: {
+					maxlength: 100
+				}
+			},
+
+			highlight: function (element, errorClass, validClass) {
+				$(element).addClass("is-invalid").removeClass("is-valid");
+			},
+			unhighlight: function (element, errorClass, validClass) {
+				$(element).addClass("is-valid").removeClass("is-invalid");
+			}
+
+		});
+	});
+</script>
+
+
 
 {% endblock %}
