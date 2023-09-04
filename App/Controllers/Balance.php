@@ -21,12 +21,10 @@ class Balance extends Authenticated
     public function newAction()
     {
 
-        
         $data = New UserBalance();
-        
-        
 
         $incomeData = $data->getIncome();
+
         $countTotalIncome = $data->countTotalIncome();
         
         $expenseData = $data->getExpense();
@@ -82,8 +80,8 @@ class Balance extends Authenticated
 
         $data = New UserBalance();
         
-        $incomeData = $data->getIncome();
-
+        $incomeData = $data->getAllIncome();
+        
         $countTotalIncome = $data->countTotalIncome();
 
         View::renderTemplate('Balance/showIncomeDetails.html', [
@@ -92,6 +90,140 @@ class Balance extends Authenticated
             'date' => $data
         ]);
 
+    }
+    
+    public function incomeEditAction()
+    {
+
+        
+        $data = New UserBalance();
+        
+        $id = $_POST["edit"];
+        $incomeData = $data->getAllIncome();
+        $category = $data->incomeCategory();
+
+        $countTotalIncome = $data->countTotalIncome();
+
+        View::renderTemplate('Balance/incomeEdit.html', [
+            'incomeData' => $incomeData,
+            'countTotalIncome' => $countTotalIncome,
+            'id' => $id,
+            'date' => $data,
+            'category' => $category
+        ]);
+
+    }
+
+    public function incomeUpdateAction()
+    {
+
+        $data = New UserBalance();
+
+        $data->incomeUpdate();
+
+        $incomeData = $data->getAllIncome();
+
+        $countTotalIncome = $data->countTotalIncome();
+
+        View::renderTemplate('Balance/showIncomeDetails.html', [
+            'incomeData' => $incomeData,
+            'countTotalIncome' => $countTotalIncome,
+            'editNumber' => $_POST["id"],
+            'date' => $data
+        ]);
+
+    }
+
+    public function incomeDeleteAction()
+    {
+
+        $data = New UserBalance();
+        
+        $data->incomeDelete();
+
+        $incomeData = $data->getAllIncome();
+        
+        $countTotalIncome = $data->countTotalIncome();
+
+        View::renderTemplate('Balance/showIncomeDetails.html', [
+            'incomeData' => $incomeData,
+            'countTotalIncome' => $countTotalIncome,
+            'date' => $data
+        ]);
+    }
+
+    public function expenseDetailsAction()
+    {
+
+        $data = New UserBalance();
+        
+        $expenseData = $data->getAllExpense();
+        
+        $countTotalExpense = $data->countTotalExpense();
+
+        View::renderTemplate('Balance/showExpenseDetails.html', [
+            'expenseData' => $expenseData,
+            'countTotalExpense' => $countTotalExpense,
+            'date' => $data
+        ]);
+    }
+
+    public function expenseEditAction()
+    {
+        $data = New UserBalance();
+
+        $id = $_POST["edit"];
+        $expenseData = $data->getAllExpense();
+        $category = $data->expenseCategory();
+        $paymentMethods = $data->paymentMethods();
+        $countTotalExpense = $data->countTotalExpense();
+
+        View::renderTemplate('Balance/expenseEdit.html', [
+            'expenseData' => $expenseData,
+            'countTotalExpense' => $countTotalExpense,
+            'id' => $id,
+            'date' => $data,
+            'category' => $category,
+            'paymentMethods' => $paymentMethods
+        ]);
+    }
+
+    public function expenseUpdateAction()
+    {
+
+        $data = New UserBalance();
+
+        $data->expenseUpdate();
+
+        $expenseData = $data->getAllExpense();
+
+        $countTotalExpense = $data->countTotalExpense();
+
+        View::renderTemplate('Balance/showExpenseDetails.html', [
+            'expenseData' => $expenseData,
+            'countTotalExpense' => $countTotalExpense,
+            'editNumber' => $_POST["id"],
+            'date' => $data
+        ]);
+
+    }
+
+    public function expenseDeleteAction()
+    {
+
+        $data = New UserBalance();
+        
+        $data->expenseDelete();
+
+        $expenseData = $data->getAllExpense();
+        
+        $countTotalExpense = $data->countTotalExpense();
+
+        View::renderTemplate('Balance/showExpenseDetails.html', [
+            'expenseData' => $expenseData,
+            'countTotalExpense' => $countTotalExpense,
+            'date' => $data
+        ]);
     }
 
 }

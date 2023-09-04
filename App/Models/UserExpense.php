@@ -65,6 +65,23 @@ class UserExpense extends \Core\Model
    }
 
    /**
+    * Validate current property values, adding valitation error messages to the errors array property
+    * 
+    * @return void
+    */
+    public function validate()
+    {
+       // username
+       if ($this->amount == '') {
+          $this->errors[] = 'Amount is required';
+       }
+ 
+       if ($this->date_of_expense == '') {
+          $this->errors[] = 'Date is required';
+       }
+    }
+
+   /**
     * Copy default categories during registration
     * 
     * @return void
@@ -112,62 +129,6 @@ class UserExpense extends \Core\Model
    }
 
    /**
-    * Assign the appropriate number to the name and return the value
-    *
-    * @return int
-    */
-   public function findCategory()
-   {
-      $user = Auth::getUser();
-
-      $sql = "SELECT id
-               FROM expenses_category_assigned_to_users 
-               WHERE name = :expense_category_assigned_to_user_id
-               AND user_id = :user_id";
-
-      $db = static::getDB();
-      
-      $stmt = $db->prepare($sql);
-
-      $stmt->execute(['expense_category_assigned_to_user_id' => $this->expense_category_assigned_to_user_id, 'user_id' => $user->id]);
-
-      $result = $stmt->fetch();
-
-      $result = (int) $result['id'];
-
-      $this->expense_category_assigned_to_user_id = $result;
-
-      static::findPaymentMethod();
-   }
-
-   /**
-    * Assign the appropriate number to the name and return the value
-    *
-    * @return int
-    */
-   private function findPaymentMethod()
-   {
-      $user = Auth::getUser();
-
-      $sql = "SELECT id
-               FROM payment_methods_assigned_to_users 
-               WHERE name = :payment_method_assigned_to_user_id
-               AND user_id = :user_id";
-
-      $db = static::getDB();
-      
-      $stmt = $db->prepare($sql);
-
-      $stmt->execute(['payment_method_assigned_to_user_id' => $this->payment_method_assigned_to_user_id, 'user_id' => $user->id]);
-
-      $result = $stmt->fetch();
-
-      $result = (int) $result['id'];
-
-      $this->payment_method_assigned_to_user_id = $result;
-   }
-
-   /**
     * Saving the entered expenses in the database
     *
     * @return array
@@ -177,18 +138,22 @@ class UserExpense extends \Core\Model
       $this->validate();
       if (empty($this->errors)) {
 
-         static::findCategory();
          $user = Auth::getUser();
          
          $sql = 'INSERT INTO expenses (user_id, expense_category_assigned_to_user_id, payment_method_assigned_to_user_id, amount, date_of_expense, expense_comment)
-         VALUES (:user_id, :expense_category_assigned_to_user_id, :payment_method_assigned_to_user_id, :amount, :date_of_expense, :expense_comment)';
+         VALUES (:user_id, 
+         (SELECT id FROM expenses_category_assigned_to_users WHERE name = :expense_category_assigned_to_user_id AND user_id = :user_id),
+         (SELECT id FROM payment_methods_assigned_to_users WHERE name = :payment_method_assigned_to_user_id AND user_id = :user_id), 
+         :amount, 
+         :date_of_expense, 
+         :expense_comment)';
 
          $db = static::getDB();
          $stmt = $db->prepare($sql);
 
          $stmt->bindValue('user_id', $user->id, PDO::PARAM_INT);
-         $stmt->bindValue('expense_category_assigned_to_user_id', $this->expense_category_assigned_to_user_id, PDO::PARAM_INT);
-         $stmt->bindValue('payment_method_assigned_to_user_id', $this->payment_method_assigned_to_user_id, PDO::PARAM_INT);
+         $stmt->bindValue('expense_category_assigned_to_user_id', $this->expense_category_assigned_to_user_id, PDO::PARAM_STR);
+         $stmt->bindValue('payment_method_assigned_to_user_id', $this->payment_method_assigned_to_user_id, PDO::PARAM_STR);
          $stmt->bindValue('amount', $this->amount, PDO::PARAM_STR);
          $stmt->bindValue('date_of_expense', $this->date_of_expense, PDO::PARAM_STR);
          $stmt->bindValue('expense_comment', $this->expense_comment, PDO::PARAM_STR);
@@ -198,21 +163,152 @@ class UserExpense extends \Core\Model
       return false;
    }
 
-   /**
-    * Validate current property values, adding valitation error messages to the errors array property
-    * 
-    * @return void
-    */
-   public function validate()
+   public static function getExpense($start_date, $end_date)
    {
-      // username
-      if ($this->amount == '') {
-         $this->errors[] = 'Amount is required';
-      }
+      $user = Auth::getUser();
 
-      if ($this->date_of_expense == '') {
-         $this->errors[] = 'Date is required';
-      }
+        $sql = "SELECT name AS expense_name, SUM(amount) AS expense_amount, date_of_expense, expense_comment 
+                   FROM expenses, expenses_category_assigned_to_users 
+                   WHERE expenses.user_id = :userId
+                   AND expenses.expense_category_assigned_to_user_id = expenses_category_assigned_to_users.id
+                   AND expenses.date_of_expense BETWEEN :startDate AND :endDate
+                   GROUP BY expense_category_assigned_to_user_id
+                   ORDER BY date_of_expense DESC";
+
+        $db = static::getDB();
+        $stmt = $db->prepare($sql);
+
+        $stmt->bindValue(':userId', $user->id, PDO::PARAM_INT);
+        $stmt->bindValue(':startDate', $start_date, PDO::PARAM_STR);
+        $stmt->bindValue(':endDate', $end_date, PDO::PARAM_STR);
+
+        $stmt->execute();
+
+        return $stmt->fetchAll();
 
    }
+
+   public static function getAllExpense($start_date, $end_date)
+   {
+      $user = Auth::getUser();
+
+      $sql = "SELECT expenses.id, expenses_category_assigned_to_users.name AS expense_name, amount AS expense_amount, date_of_expense, expense_comment, payment_methods_assigned_to_users.name AS payment_methods 
+              FROM expenses, expenses_category_assigned_to_users, payment_methods_assigned_to_users
+              WHERE expenses.user_id = :userId
+              AND expenses.expense_category_assigned_to_user_id = expenses_category_assigned_to_users.id
+              AND expenses.payment_method_assigned_to_user_id = payment_methods_assigned_to_users.id
+              AND expenses.date_of_expense BETWEEN :startDate AND :endDate
+              ORDER BY expenses.date_of_expense DESC";
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+
+      $stmt->bindValue(':userId', $user->id, PDO::PARAM_INT);
+      $stmt->bindValue(':startDate', $start_date, PDO::PARAM_STR);
+      $stmt->bindValue(':endDate', $end_date, PDO::PARAM_STR);
+
+      $stmt->execute();
+
+      return $stmt->fetchAll();
+   }
+
+   public static function countTotalExpense($start_date, $end_date)
+   {
+      $user = Auth::getUser();
+
+      $sql = "SELECT SUM(amount) AS expense_sum
+           FROM expenses, expenses_category_assigned_to_users 
+           WHERE expenses.expense_category_assigned_to_user_id = expenses_category_assigned_to_users.id
+           AND expenses.user_id = :userId 
+           AND expenses.date_of_expense BETWEEN :startDate AND :endDate";
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+
+      $stmt->bindValue(':userId', $user->id, PDO::PARAM_INT);
+      $stmt->bindValue(':startDate', $start_date, PDO::PARAM_STR);
+      $stmt->bindValue(':endDate', $end_date, PDO::PARAM_STR);
+
+      $stmt->execute();
+
+      return $stmt->fetchColumn();
+
+   }
+
+   public static function expenseUpdate($data)
+   {
+      $user = Auth::getUser();
+      $sql = "UPDATE expenses
+              SET expense_category_assigned_to_user_id = (SELECT id FROM expenses_category_assigned_to_users WHERE name = :expense_category_assigned_to_user_id AND user_id = :user_id), 
+              amount = :amount, 
+              date_of_expense = :date_of_expense, 
+              expense_comment = :expense_comment,
+              payment_method_assigned_to_user_id = (SELECT id FROM payment_methods_assigned_to_users WHERE name = :payment_method_assigned_to_user_id AND user_id = :user_id)
+              WHERE id = :id";
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+
+      $stmt->bindValue(':user_id', $user->id, PDO::PARAM_INT);
+      $stmt->bindValue(':expense_category_assigned_to_user_id', $data["expense_category_assigned_to_user_id"], PDO::PARAM_STR);
+      $stmt->bindValue(':amount', $data["expense_amount"], PDO::PARAM_STR);
+      $stmt->bindValue(':date_of_expense', $data["date_of_expense"], PDO::PARAM_STR);
+      $stmt->bindValue(':expense_comment', $data["expense_comment"], PDO::PARAM_STR);
+      $stmt->bindValue(':payment_method_assigned_to_user_id', $data["payment_method_assigned_to_user_id"], PDO::PARAM_STR);
+      $stmt->bindValue(':id', $data["id"], PDO::PARAM_INT);
+
+      $stmt->execute();
+   }
+
+   public static function expenseCategory()
+   {
+      $user = Auth::getUser();
+
+
+      $sql = "SELECT expenses_category_assigned_to_users.name AS expense_name
+              FROM expenses_category_assigned_to_users
+              WHERE expenses_category_assigned_to_users.user_id = :userId";
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+
+      $stmt->bindValue(':userId', $user->id, PDO::PARAM_INT);
+
+      $stmt->execute();
+
+      return $stmt->fetchAll(PDO::FETCH_ASSOC);
+   }
+
+   public static function paymentMethods()
+   {
+      $user = Auth::getUser();
+
+
+      $sql = "SELECT payment_methods_assigned_to_users.name AS payment_methods
+              FROM payment_methods_assigned_to_users
+              WHERE payment_methods_assigned_to_users.user_id = :userId";
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+
+      $stmt->bindValue(':userId', $user->id, PDO::PARAM_INT);
+
+      $stmt->execute();
+
+      return $stmt->fetchAll(PDO::FETCH_ASSOC);
+   }
+
+   public static function expenseDelete($data)
+   {
+      $sql = "DELETE FROM expenses
+             WHERE id = :id";
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+
+      $stmt->bindValue(':id', $data["delete"], PDO::PARAM_INT);
+
+      $stmt->execute();
+   }
+
 }
