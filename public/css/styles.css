@@ -73,33 +73,12 @@ h3{
     padding-top: 1rem;
 }
 
-.piechart {
-    width: 300px;
-    height: 100px;
-    border-radius: 60%;
-    background: conic-gradient(
-        red 70deg, 
-        lightblue 0 235deg, 
-        orange 0);
+.table-responsive {
+    max-height: 400px;
 }
 
-.temporarytext{
-    opacity: inherit;
-	background: rgba(44, 204, 44, 0.3)
+#reportrange {
+    cursor: pointer;
+    border: 1px solid #ccc;
+    padding: 5px 10px;
 }
-
-.table1{
-	float: left;
-}
-
-.table2{
-	float: right;
-}
-
-@media (max-width: 576px) {
-
-	.table1, .table2{
-        clear: both;
-        width: 100%;
-	}
-  }

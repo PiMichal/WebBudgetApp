@@ -24,13 +24,14 @@ class Income extends Authenticated
         View::renderTemplate('Income/new.html');
     }
 
-        /**
+    /**
      * Adding income
      * 
      * @return void
      */
     public function addAction()
     {   
+
         $income = new UserIncome($_POST);
 
         if ($income->saveIncome()) {
