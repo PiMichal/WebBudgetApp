@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\UserBalance;
 use Core\View;
+use App\Flash;
 
 /**
  * Income controller
@@ -124,7 +125,8 @@ class Balance extends Authenticated
         $incomeData = $data->getAllIncome();
 
         $countTotalIncome = $data->countTotalIncome();
-
+        
+        Flash::addMessage('Successfully updated data');
         View::renderTemplate('Balance/showIncomeDetails.html', [
             'incomeData' => $incomeData,
             'countTotalIncome' => $countTotalIncome,
@@ -144,7 +146,7 @@ class Balance extends Authenticated
         $incomeData = $data->getAllIncome();
         
         $countTotalIncome = $data->countTotalIncome();
-
+        Flash::addMessage('Successful deletion of data', Flash::INFO);
         View::renderTemplate('Balance/showIncomeDetails.html', [
             'incomeData' => $incomeData,
             'countTotalIncome' => $countTotalIncome,
@@ -199,6 +201,7 @@ class Balance extends Authenticated
 
         $countTotalExpense = $data->countTotalExpense();
 
+        Flash::addMessage('Successfully updated data');
         View::renderTemplate('Balance/showExpenseDetails.html', [
             'expenseData' => $expenseData,
             'countTotalExpense' => $countTotalExpense,
@@ -219,6 +222,7 @@ class Balance extends Authenticated
         
         $countTotalExpense = $data->countTotalExpense();
 
+        Flash::addMessage('Successful deletion of data', Flash::INFO);
         View::renderTemplate('Balance/showExpenseDetails.html', [
             'expenseData' => $expenseData,
             'countTotalExpense' => $countTotalExpense,

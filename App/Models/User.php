@@ -105,8 +105,9 @@ class User extends \Core\Model
      */
     public function save()
     {
-        $this->validate();
 
+        $this->validate();
+        $this->validatePassword();
         if (empty($this->errors)) {
 
             $password = password_hash($this->password, PASSWORD_DEFAULT);
@@ -145,6 +146,15 @@ class User extends \Core\Model
             $this->errors[] = 'email already taken';
         }
 
+    }
+
+     /**
+     * Validate current property values, adding valitation error messages to the errors array property
+     * 
+     * @return void
+     */
+    public function validatePassword()
+    {
         // Password
         if ($this->password != $this->password_confirmation) {
             $this->errors[] = 'Password must match confirmation';
@@ -393,6 +403,7 @@ class User extends \Core\Model
         $this->password_confirmation = $password_confirmation;
 
         $this->validate();
+        $this->validatePassword();
 
 
         if (empty($this->errors)) {
@@ -416,6 +427,65 @@ class User extends \Core\Model
             return $stmt->execute();
         }
 
+        return false;
+    }
+
+    /**
+     * Get all the users as an associative array
+     *
+     * @return array
+     */
+    public function update()
+    {
+        $this->id = $_SESSION['user_id'];
+        $this->validate();
+
+        if (empty($this->errors) && $this->password == "") {
+
+            $sql = 'UPDATE users
+                    SET username = :username,
+                    email = :email
+                    WHERE id = :id';
+
+            $db = static::getDB();
+            $stmt = $db->prepare($sql);
+
+            $stmt->bindValue(':username', $this->username, PDO::PARAM_STR);
+            $stmt->bindValue(':email', $this->email, PDO::PARAM_STR);
+            $stmt->bindValue(':id', $this->id, PDO::PARAM_INT);
+
+            return $stmt->execute();
+        }
+        return false;
+    }
+
+    public function updatePassword()
+    {
+        $this->id = $_SESSION['user_id'];
+        $this->password_confirmation = $this->password;
+        $this->validate();
+        $this->validatePassword();
+
+        if (empty($this->errors)) {
+
+            $password = password_hash($this->password, PASSWORD_DEFAULT);
+
+            $sql = 'UPDATE users
+                    SET username = :username,
+                    email = :email,
+                    password = :password
+                    WHERE id = :id';
+
+            $db = static::getDB();
+            $stmt = $db->prepare($sql);
+
+            $stmt->bindValue(':username', $this->username, PDO::PARAM_STR);
+            $stmt->bindValue(':email', $this->email, PDO::PARAM_STR);
+            $stmt->bindValue('password', $password, PDO::PARAM_STR);
+            $stmt->bindValue(':id', $this->id, PDO::PARAM_INT);
+
+            return $stmt->execute();
+        }
         return false;
     }
 }
