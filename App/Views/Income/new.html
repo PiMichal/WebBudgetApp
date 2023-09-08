@@ -133,10 +133,9 @@
 	
 				<select class="form-select" id="inputCategory" name="income_category_assigned_to_user_id"
 					value="{{ income.income_category_assigned_to_user_id }}" required>
-					<option>Salary</option>
-					<option>Interest</option>
-					<option>Allegro</option>
-					<option>Another</option>
+					{% for category in category %}
+					<option>{{ category.income_name }}</option>
+					{% endfor %}
 				</select>
 	
 	

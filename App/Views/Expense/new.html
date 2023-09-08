@@ -125,30 +125,17 @@
 				<label for="inputPaymentMethod" class="form-label mb-3">Payment method</label>
 
 				<select class="form-select" id="inputPaymentMethod" name="payment_method_assigned_to_user_id" value="{{ expense.payment_method_assigned_to_user_id }}" required>
-					<option>Cash</option>
-					<option>Debit Card</option>
-					<option>Credit Card</option>
+					{% for payment_methods in payment_methods %}
+					<option>{{ payment_methods.payment_methods }}</option>
+					{% endfor %}
 				</select>
 
 				<label for="inputCategory" class="form-label my-3">Category</label>
 
 				<select class="form-select" id="inputCategory" name="expense_category_assigned_to_user_id" value="{{ expense.expense_category_assigned_to_user_id }}" required>
-					<option>Transport</option>
-					<option>Books</option>
-					<option>Food</option>
-					<option>Apartments</option>
-					<option>Telecommunication</option>
-					<option>Health</option>
-					<option>Clothes</option>
-					<option>Hygiene</option>
-					<option>Kids</option>
-					<option>Recreation</option>
-					<option>Trip</option>
-					<option>Savings</option>
-					<option>For Retirement</option>
-					<option>Debt Repayment</option>
-					<option>Gift</option>
-					<option>Another</option>
+					{% for category in category %}
+					<option>{{ category.expense_name }}</option>
+					{% endfor %}
 				</select>
 
 				<div class="my-3">

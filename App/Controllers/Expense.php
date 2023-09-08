@@ -20,8 +20,11 @@ class Expense extends Authenticated
      * @return void
      */
     public function newAction()
-    {
-        View::renderTemplate('Expense/new.html');
+    {   
+        View::renderTemplate('Expense/new.html', [
+            'category' => UserExpense::expenseCategory(),
+            'payment_methods' => UserExpense::paymentMethods()
+        ]);
     }
 
     /**
@@ -40,6 +43,8 @@ class Expense extends Authenticated
         } else {
 
             View::renderTemplate('Expense/new.html', [
+                'category' => UserExpense::expenseCategory(),
+                'payment_methods' => UserExpense::paymentMethods(),
                 'expense' => $expense
             ]);
             

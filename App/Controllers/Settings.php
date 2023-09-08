@@ -6,6 +6,7 @@ use App\Auth;
 use \Core\View;
 use App\Models\User;
 use App\Flash;
+use App\Models\UserIncome;
 
 /**
  * Home controller
@@ -58,6 +59,34 @@ class Settings extends Authenticated
                 'user' => $user
             ]);
         }
+    }
+
+    public function incomeAddAction()
+    {
+        View::renderTemplate('Settings/incomeAdd.html', [
+        ]);
+
+    }
+
+    public function incomeSaveAction()
+    {
+        $income = new UserIncome();
+
+        if ($income->categoryValidate($_POST["new_category"])) {
+            $income->incomeAddCategory($_POST["new_category"]);
+            Flash::addMessage('Category added');
+            View::renderTemplate('Settings/settings.html', [
+            ]);
+
+        } else {
+            Flash::addMessage('Category not added', Flash::WARNING);
+            View::renderTemplate('Settings/incomeAdd.html', [
+                'user' => $income,
+                'category' => $_POST["new_category"]
+            ]);
+        }
+        
+
     }
 
 }

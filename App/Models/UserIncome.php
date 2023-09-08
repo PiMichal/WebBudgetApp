@@ -76,6 +76,72 @@ class UserIncome extends \Core\Model
    }
 
    /**
+    * Find a user model by email address
+    * 
+    * @param string $email email address to search for
+    * 
+    * @return mixed User object if found, flase otherwise
+    */
+   public function findByCategory($category)
+   {
+      $user = Auth::getUser();
+
+      $sql = 'SELECT COUNT(*) AS category
+               FROM incomes_category_assigned_to_users 
+               WHERE name = :category
+               AND user_id = :user_id';
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+      $stmt->bindParam('category', $category, PDO::PARAM_STR);
+      $stmt->bindParam('user_id', $user->id, PDO::PARAM_INT);
+
+      $stmt->execute();
+
+      $category = $stmt->fetch(PDO::FETCH_ASSOC);
+
+      if ($category['category'] == 0) {
+         return false;
+      } else {
+         return true;
+      }
+
+   }
+
+   /**
+    * Validate current property values, adding valitation error messages to the errors array property
+    * 
+    * @return void
+    */
+   public function categoryValidate($category)
+   {
+      // category
+
+      if (static::findByCategory($_POST["new_category"])) {
+         $this->errors[] = 'Category already exists';
+         return false;
+      }
+
+      if ($category == '') {
+         $this->errors[] = 'Category is required';
+         return false;
+      }
+
+      if (!ctype_alpha($category)) {
+         $this->errors[] = "The string $category does not consist of all letters";
+         return false;
+      }
+
+      if (strlen($category) > 50) {
+         $this->errors[] = 'Too many characters - maximum 50 characters';
+         return false;
+      }
+
+      return true;
+
+   }
+
+   /**
     * Copy default categories during registration
     * 
     * @return void
@@ -239,6 +305,22 @@ class UserIncome extends \Core\Model
       $stmt->execute();
 
       return $stmt->fetchAll(PDO::FETCH_ASSOC);
+   }
+
+   public static function incomeAddCategory($category)
+   {
+      $user = Auth::getUser();
+
+      $sql = "INSERT INTO incomes_category_assigned_to_users (user_id, name)
+               VALUES (:user_id, :name)";
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+
+      $stmt->bindValue(':user_id', $user->id, PDO::PARAM_INT);
+      $stmt->bindValue(':name', $category, PDO::PARAM_STR);
+
+      $stmt->execute();
    }
 
    public static function incomeDelete($data)
