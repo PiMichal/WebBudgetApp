@@ -81,6 +81,100 @@ class UserExpense extends \Core\Model
        }
     }
 
+    public function findByCategory($category)
+   {
+      $user = Auth::getUser();
+
+      $sql = 'SELECT COUNT(*) AS category
+               FROM expenses_category_assigned_to_users 
+               WHERE name = :category
+               AND user_id = :user_id';
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+      $stmt->bindParam('category', $category, PDO::PARAM_STR);
+      $stmt->bindParam('user_id', $user->id, PDO::PARAM_INT);
+
+      $stmt->execute();
+
+      $category = $stmt->fetch(PDO::FETCH_ASSOC);
+
+      if ($category['category'] == 0) {
+         return false;
+      } else {
+         return true;
+      }
+
+   }
+
+   public function findByPaymentMethod($payment_method)
+   {
+      $user = Auth::getUser();
+
+      $sql = 'SELECT COUNT(*) AS payment_method
+               FROM payment_methods_assigned_to_users 
+               WHERE name = :payment_method
+               AND user_id = :user_id';
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+      $stmt->bindParam('payment_method', $payment_method, PDO::PARAM_STR);
+      $stmt->bindParam('user_id', $user->id, PDO::PARAM_INT);
+
+      $stmt->execute();
+
+      $payment_method = $stmt->fetch(PDO::FETCH_ASSOC);
+
+      if ($payment_method['payment_method'] == 0) {
+         return false;
+      } else {
+         return true;
+      }
+
+   }
+
+    /**
+    * Validate current property values, adding valitation error messages to the errors array property
+    * 
+    * @return void
+    */
+   public function categoryValidate($category)
+   {
+      // category
+
+      if (static::findByCategory($category)) {
+         $this->errors[] = 'Category already exists';
+         return false;
+      }
+
+      if (static::findByPaymentMethod($category)) {
+         $this->errors[] = 'Payment method already exists';
+         return false;
+      }
+
+      if ($category == '') {
+         $this->errors[] = 'Category is required';
+         return false;
+      }
+
+      if (!ctype_alpha(str_replace(' ', '', $category))) {
+         $this->errors[] = "The string $category does not consist of all letters";
+         return false;
+      }
+
+      if (strlen($category) > 50) {
+         $this->errors[] = 'Too many characters - maximum 50 characters';
+         return false;
+      }
+
+
+
+      return true;
+
+   }
+
+   
+
    /**
     * Copy default categories during registration
     * 
@@ -279,10 +373,100 @@ class UserExpense extends \Core\Model
       return $stmt->fetchAll(PDO::FETCH_ASSOC);
    }
 
-   public static function paymentMethods()
+   public static function expenseAddCategory($category)
    {
       $user = Auth::getUser();
 
+      $sql = "INSERT INTO expenses_category_assigned_to_users (user_id, name)
+               VALUES (:user_id, :name)";
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+
+      $stmt->bindValue(':user_id', $user->id, PDO::PARAM_INT);
+      $stmt->bindValue(':name', $category, PDO::PARAM_STR);
+
+      $stmt->execute();
+   }
+
+   public static function expenseRename($new_category)
+   {
+
+      $user = Auth::getUser();
+
+      $sql = "UPDATE expenses_category_assigned_to_users
+              SET name = :new_category
+              WHERE user_id = :user_id
+              AND
+              name = :name";
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+
+      $stmt->bindValue(':user_id', $user->id, PDO::PARAM_INT);
+      $stmt->bindValue(':new_category', $new_category, PDO::PARAM_STR);
+      $stmt->bindValue(':name', $_POST['expense_name'], PDO::PARAM_STR);
+
+      $stmt->execute();
+   }
+
+   public static function categoryDelete()
+   {
+      static::updateTheDeletedCategory();
+      
+      $user = Auth::getUser();
+
+      $sql = "DELETE FROM expenses_category_assigned_to_users
+             WHERE user_id = :user_id
+             AND
+             name = :category";
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+
+      $stmt->bindValue(':user_id', $user->id, PDO::PARAM_INT);
+      $stmt->bindValue(':category', $_POST["expense_name"], PDO::PARAM_STR);
+
+      $stmt->execute();
+   }
+
+   public static function updateTheDeletedCategory()
+   {
+      $user = Auth::getUser();
+
+      $sql = "UPDATE expenses
+              SET expense_category_assigned_to_user_id = (SELECT id FROM expenses_category_assigned_to_users WHERE user_id = :user_id 
+              AND name != :removed_category LIMIT 1)
+              WHERE user_id = :user_id
+              AND expense_category_assigned_to_user_id = (SELECT id FROM expenses_category_assigned_to_users WHERE user_id = :user_id 
+              AND name = :removed_category)";
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+
+      $stmt->bindValue(':user_id', $user->id, PDO::PARAM_INT);
+      $stmt->bindValue(':removed_category', $_POST["expense_name"], PDO::PARAM_STR);
+
+      $stmt->execute();
+
+   }
+
+   public static function expenseDelete($data)
+   {
+      $sql = "DELETE FROM expenses
+             WHERE id = :id";
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+
+      $stmt->bindValue(':id', $data["delete"], PDO::PARAM_INT);
+
+      $stmt->execute();
+   }
+
+   public static function paymentMethods()
+   {
+      $user = Auth::getUser();
 
       $sql = "SELECT payment_methods_assigned_to_users.name AS payment_methods
               FROM payment_methods_assigned_to_users
@@ -298,17 +482,83 @@ class UserExpense extends \Core\Model
       return $stmt->fetchAll(PDO::FETCH_ASSOC);
    }
 
-   public static function expenseDelete($data)
+   public static function addAPaymentMethod($category)
    {
-      $sql = "DELETE FROM expenses
-             WHERE id = :id";
+      $user = Auth::getUser();
+
+      $sql = "INSERT INTO payment_methods_assigned_to_users (user_id, name)
+               VALUES (:user_id, :name)";
 
       $db = static::getDB();
       $stmt = $db->prepare($sql);
 
-      $stmt->bindValue(':id', $data["delete"], PDO::PARAM_INT);
+      $stmt->bindValue(':user_id', $user->id, PDO::PARAM_INT);
+      $stmt->bindValue(':name', $category, PDO::PARAM_STR);
 
       $stmt->execute();
    }
+
+   public static function paymentMethodRename($new_payment_method)
+   {
+      $user = Auth::getUser();
+
+      $sql = "UPDATE payment_methods_assigned_to_users
+              SET name = :new_payment_method
+              WHERE user_id = :user_id
+              AND
+              name = :name";
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+
+      $stmt->bindValue(':user_id', $user->id, PDO::PARAM_INT);
+      $stmt->bindValue(':new_payment_method', $new_payment_method, PDO::PARAM_STR);
+      $stmt->bindValue(':name', $_POST['payment_methods'], PDO::PARAM_STR);
+
+      $stmt->execute();
+   }
+
+   public static function paymentMethodDelete()
+   {
+      static::updateRemovedPaymentMethod();
+      
+      $user = Auth::getUser();
+
+      $sql = "DELETE FROM payment_methods_assigned_to_users
+             WHERE user_id = :user_id
+             AND
+             name = :payment_method";
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+
+      $stmt->bindValue(':user_id', $user->id, PDO::PARAM_INT);
+      $stmt->bindValue(':payment_method', $_POST["payment_methods"], PDO::PARAM_STR);
+
+      $stmt->execute();
+   }
+
+   public static function updateRemovedPaymentMethod()
+   {
+      $user = Auth::getUser();
+
+      $sql = "UPDATE expenses
+              SET payment_method_assigned_to_user_id = (SELECT id FROM payment_methods_assigned_to_users WHERE user_id = :user_id 
+              AND name != :removed_payment_method LIMIT 1)
+              WHERE user_id = :user_id
+              AND payment_method_assigned_to_user_id = (SELECT id FROM payment_methods_assigned_to_users WHERE user_id = :user_id 
+              AND name = :removed_payment_method)";
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+
+      $stmt->bindValue(':user_id', $user->id, PDO::PARAM_INT);
+      $stmt->bindValue(':removed_payment_method', $_POST["payment_methods"], PDO::PARAM_STR);
+
+      $stmt->execute();
+
+   }
+
+
 
 }

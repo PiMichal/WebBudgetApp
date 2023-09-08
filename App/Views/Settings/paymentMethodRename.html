@@ -96,27 +96,27 @@
 				</ul>
 				{% endif %}
 				<hr>
-                <label for="inputCategory" class="form-label mb-3">Select a category to rename</label>
+                <label for="inputCategory" class="form-label mb-3">Select the payment method to rename</label>
 	
-				<select class="form-select" id="inputCategory" name="income_name" required>
-					{% for category in category %}
-					{% if selected_category == category.income_name %}
-					<option selected>{{ category.income_name }}</option>
+				<select class="form-select" id="inputCategory" name="payment_methods" required>
+					{% for payment_methods in payment_methods %}
+					{% if selected_payment_methods == payment_methods.payment_methods %}
+					<option selected>{{ payment_methods.payment_methods }}</option>
 					{% else %}
-					<option >{{ category.income_name }}</option>
+					<option >{{ payment_methods.payment_methods }}</option>
 					{% endif %}
 					{% endfor %}
 				</select>
                 <div class="my-3">
 					<label for="category" class="form-label">Enter a new name</label>
 					<input id="category" type="text" class="form-control" placeholder="Enter a new name"
-						name="new_category" maxlength="50" value="{{ new_category }}" required>
+						name="new_payment_method" maxlength="50" value="{{ new_payment_method }}" required>
                     <span class="pull-right label label-default" id="count_message"></span>
 				</div>
                 <div class="mb-3 text-center">
 					<button class="btn btn-danger col-md-4" type="submit" id="cancel"
 						formaction="/settings/settings">Cancel</button>
-					<button class="btn btn-success col-md-4 mx-3" type="submit" formaction="/settings/incomeRenameSave">Rename</button>
+					<button class="btn btn-success col-md-4 mx-3" type="submit" formaction="/settings/paymentMethodRenameSave">Rename</button>
 				</div>
 			</form>
 		</main>

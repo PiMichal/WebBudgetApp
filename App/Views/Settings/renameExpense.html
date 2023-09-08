@@ -98,12 +98,12 @@
 				<hr>
                 <label for="inputCategory" class="form-label mb-3">Select a category to rename</label>
 	
-				<select class="form-select" id="inputCategory" name="income_name" required>
+				<select class="form-select" id="inputCategory" name="expense_name" required>
 					{% for category in category %}
-					{% if selected_category == category.income_name %}
-					<option selected>{{ category.income_name }}</option>
+					{% if selected_category == category.expense_name %}
+					<option selected>{{ category.expense_name }}</option>
 					{% else %}
-					<option >{{ category.income_name }}</option>
+					<option >{{ category.expense_name }}</option>
 					{% endif %}
 					{% endfor %}
 				</select>
@@ -116,7 +116,7 @@
                 <div class="mb-3 text-center">
 					<button class="btn btn-danger col-md-4" type="submit" id="cancel"
 						formaction="/settings/settings">Cancel</button>
-					<button class="btn btn-success col-md-4 mx-3" type="submit" formaction="/settings/incomeRenameSave">Rename</button>
+					<button class="btn btn-success col-md-4 mx-3" type="submit" formaction="/settings/expenseRenameSave">Rename</button>
 				</div>
 			</form>
 		</main>

@@ -87,7 +87,7 @@
 		<main class="container py-5">
 			<form class="text-white" method="post">
 				<h3>Settings</h3>
-				{% if user.errors is not empty %}
+                {% if user.errors is not empty %}
 				<h5 class="text-start">Errors:</h5>
 				<ul class="text-start">
 					{% for error in user.errors %}
@@ -96,27 +96,16 @@
 				</ul>
 				{% endif %}
 				<hr>
-                <label for="inputCategory" class="form-label mb-3">Select a category to rename</label>
-	
-				<select class="form-select" id="inputCategory" name="income_name" required>
-					{% for category in category %}
-					{% if selected_category == category.income_name %}
-					<option selected>{{ category.income_name }}</option>
-					{% else %}
-					<option >{{ category.income_name }}</option>
-					{% endif %}
-					{% endfor %}
-				</select>
                 <div class="my-3">
-					<label for="category" class="form-label">Enter a new name</label>
-					<input id="category" type="text" class="form-control" placeholder="Enter a new name"
-						name="new_category" maxlength="50" value="{{ new_category }}" required>
+					<label for="payment_method" class="form-label">Enter a new payment method</label>
+					<input id="payment_method" type="text" class="form-control" placeholder="Enter a new payment method"
+						name="new_payment_method" value="{{ category }}" maxlength="50" required>
                     <span class="pull-right label label-default" id="count_message"></span>
 				</div>
                 <div class="mb-3 text-center">
 					<button class="btn btn-danger col-md-4" type="submit" id="cancel"
 						formaction="/settings/settings">Cancel</button>
-					<button class="btn btn-success col-md-4 mx-3" type="submit" formaction="/settings/incomeRenameSave">Rename</button>
+					<button class="btn btn-success col-md-4 mx-3" type="submit" formaction="/settings/paymentMethodSave">Add</button>
 				</div>
 			</form>
 		</main>
@@ -131,8 +120,8 @@
     var text_max = 50;
 	$('#count_message').html('0 / ' + text_max);
 
-	$('#category').keyup(function () {
-		var text_length = $('#category').val().length;
+	$('#payment_method').keyup(function () {
+		var text_length = $('#payment_method').val().length;
 		var text_remaining = text_max - text_length;
 
 		$('#count_message').html(text_length + ' / ' + text_max);
@@ -142,7 +131,7 @@
      * Validate the form
      */
      $("#cancel").click(function() {
-        document.getElementById("category").required = false;
+        document.getElementById("payment_method").required = false;
      })
 
   });

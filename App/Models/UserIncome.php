@@ -75,13 +75,6 @@ class UserIncome extends \Core\Model
       }
    }
 
-   /**
-    * Find a user model by email address
-    * 
-    * @param string $email email address to search for
-    * 
-    * @return mixed User object if found, flase otherwise
-    */
    public function findByCategory($category)
    {
       $user = Auth::getUser();
@@ -117,7 +110,7 @@ class UserIncome extends \Core\Model
    {
       // category
 
-      if (static::findByCategory($_POST["new_category"])) {
+      if (static::findByCategory($category)) {
          $this->errors[] = 'Category already exists';
          return false;
       }
@@ -323,7 +316,7 @@ class UserIncome extends \Core\Model
       $stmt->execute();
    }
 
-   public static function incomeRename()
+   public static function incomeRename($new_category)
    {
 
       $user = Auth::getUser();
@@ -338,7 +331,7 @@ class UserIncome extends \Core\Model
       $stmt = $db->prepare($sql);
 
       $stmt->bindValue(':user_id', $user->id, PDO::PARAM_INT);
-      $stmt->bindValue(':new_category', $_POST['new_category'], PDO::PARAM_STR);
+      $stmt->bindValue(':new_category', $new_category, PDO::PARAM_STR);
       $stmt->bindValue(':name', $_POST['income_name'], PDO::PARAM_STR);
 
       $stmt->execute();
