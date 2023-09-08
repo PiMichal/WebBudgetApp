@@ -323,6 +323,68 @@ class UserIncome extends \Core\Model
       $stmt->execute();
    }
 
+   public static function incomeRename()
+   {
+
+      $user = Auth::getUser();
+
+      $sql = "UPDATE incomes_category_assigned_to_users
+              SET name = :new_category
+              WHERE user_id = :user_id
+              AND
+              name = :name";
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+
+      $stmt->bindValue(':user_id', $user->id, PDO::PARAM_INT);
+      $stmt->bindValue(':new_category', $_POST['new_category'], PDO::PARAM_STR);
+      $stmt->bindValue(':name', $_POST['income_name'], PDO::PARAM_STR);
+
+      $stmt->execute();
+   }
+
+   public static function categoryDelete()
+   {
+      static::updateTheDeletedCategory();
+      
+      $user = Auth::getUser();
+
+      $sql = "DELETE FROM incomes_category_assigned_to_users
+             WHERE user_id = :user_id
+             AND
+             name = :category";
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+
+      $stmt->bindValue(':user_id', $user->id, PDO::PARAM_INT);
+      $stmt->bindValue(':category', $_POST["income_name"], PDO::PARAM_STR);
+
+      $stmt->execute();
+   }
+
+   public static function updateTheDeletedCategory()
+   {
+      $user = Auth::getUser();
+
+      $sql = "UPDATE incomes
+              SET income_category_assigned_to_user_id = (SELECT id FROM incomes_category_assigned_to_users WHERE user_id = :user_id 
+              AND name != :removed_category LIMIT 1)
+              WHERE user_id = :user_id
+              AND income_category_assigned_to_user_id = (SELECT id FROM incomes_category_assigned_to_users WHERE user_id = :user_id 
+              AND name = :removed_category)";
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+
+      $stmt->bindValue(':user_id', $user->id, PDO::PARAM_INT);
+      $stmt->bindValue(':removed_category', $_POST["income_name"], PDO::PARAM_STR);
+
+      $stmt->execute();
+
+   }
+
    public static function incomeDelete($data)
    {
       $sql = "DELETE FROM incomes
@@ -335,4 +397,6 @@ class UserIncome extends \Core\Model
 
       $stmt->execute();
    }
+
+
 }

@@ -87,7 +87,7 @@
 		<main class="container py-5">
 			<form class="text-white" method="post">
 				<h3>Settings</h3>
-                {% if user.errors is not empty %}
+				{% if user.errors is not empty %}
 				<h5 class="text-start">Errors:</h5>
 				<ul class="text-start">
 					{% for error in user.errors %}
@@ -96,16 +96,27 @@
 				</ul>
 				{% endif %}
 				<hr>
+                <label for="inputCategory" class="form-label mb-3">Select a category to rename</label>
+	
+				<select class="form-select" id="inputCategory" name="income_name" required>
+					{% for category in category %}
+					{% if selected_category == category.income_name %}
+					<option selected>{{ category.income_name }}</option>
+					{% else %}
+					<option >{{ category.income_name }}</option>
+					{% endif %}
+					{% endfor %}
+				</select>
                 <div class="my-3">
-					<label for="category" class="form-label">Enter a new category incomes</label>
-					<input id="category" type="text" class="form-control" placeholder="Enter new category"
-						name="new_category" value="{{ category }}" maxlength="50" required>
+					<label for="category" class="form-label">Enter a new name</label>
+					<input id="category" type="text" class="form-control" placeholder="Enter new name"
+						name="new_category" maxlength="50" value="{{ new_category }}" required>
                     <span class="pull-right label label-default" id="count_message"></span>
 				</div>
                 <div class="mb-3 text-center">
 					<button class="btn btn-danger col-md-4" type="submit" id="cancel"
 						formaction="/settings/settings">Cancel</button>
-					<button class="btn btn-success col-md-4 mx-3" type="submit" formaction="/settings/incomeSave">Add</button>
+					<button class="btn btn-success col-md-4 mx-3" type="submit" formaction="/settings/incomeRenameSave">Rename</button>
 				</div>
 			</form>
 		</main>
