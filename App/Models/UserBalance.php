@@ -13,8 +13,17 @@ use App\Auth;
 use PDO;
 
 class UserBalance extends \Core\Model
-{
+{   
+    /**
+     * Start date
+     * @var string
+     */
     public $start_date;
+
+    /**
+     * End date
+     * @var string
+     */
     public $end_date;
 
     public function getIncome()
@@ -113,6 +122,11 @@ class UserBalance extends \Core\Model
         }
     }
 
+    /**
+     * Setting the right date
+     * 
+     * @return balance of income and expenses
+     */
     public function grandTotal()
     {
 

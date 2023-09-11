@@ -14,7 +14,7 @@ class Home extends Authenticated
 {
 
     /**
-     * Show the index page
+     * Show the home page
      *
      * @return void
      */

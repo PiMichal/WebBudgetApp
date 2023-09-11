@@ -76,6 +76,68 @@ class UserIncome extends \Core\Model
    }
 
    /**
+    * See if a user record already exists with the specified category
+    * 
+    * @return boolean True if a record already exists with specified category, false otherwise
+    */
+   public function findByCategory($category)
+   {
+      $user = Auth::getUser();
+
+      $sql = 'SELECT COUNT(*) AS category
+               FROM incomes_category_assigned_to_users 
+               WHERE name = :category
+               AND user_id = :user_id';
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+      $stmt->bindParam('category', $category, PDO::PARAM_STR);
+      $stmt->bindParam('user_id', $user->id, PDO::PARAM_INT);
+
+      $stmt->execute();
+
+      $category = $stmt->fetch(PDO::FETCH_ASSOC);
+
+      if ($category['category'] == 0) {
+         return false;
+      } else {
+         return true;
+      }
+   }
+
+   /**
+    * Validate current property values, adding valitation error messages to the errors array property
+    * 
+    * @return void
+    */
+   public function categoryValidate($category)
+   {
+      // category
+
+      if (static::findByCategory($category)) {
+         $this->errors[] = 'Category already exists';
+         return false;
+      }
+
+      if ($category == '') {
+         $this->errors[] = 'Category is required';
+         return false;
+      }
+
+      if (!ctype_alpha($category)) {
+         $this->errors[] = "The string $category does not consist of all letters";
+         return false;
+      }
+
+      if (strlen($category) > 50) {
+         $this->errors[] = 'Too many characters - maximum 50 characters';
+         return false;
+      }
+
+      return true;
+   }
+
+   /**
     * Copy default categories during registration
     * 
     * @return void
@@ -131,6 +193,11 @@ class UserIncome extends \Core\Model
       return false;
    }
 
+   /**
+    * Display of user incomes over a specified period
+    * 
+    * @return array
+    */
    public static function getIncome($start_date, $end_date)
    {
       $user = Auth::getUser();
@@ -154,6 +221,11 @@ class UserIncome extends \Core\Model
       return $stmt->fetchAll();
    }
 
+   /**
+    * View detailed user incomes over a specified period
+    * 
+    * @return array
+    */
    public static function getAllIncome($start_date, $end_date)
    {
       $user = Auth::getUser();
@@ -177,6 +249,11 @@ class UserIncome extends \Core\Model
       return $stmt->fetchAll();
    }
 
+   /**
+    * Calculation of the sum of the user's incomes in a given period
+    * 
+    * @return string
+    */
    public static function countTotalIncome($start_date, $end_date)
    {
       $user = Auth::getUser();
@@ -199,6 +276,11 @@ class UserIncome extends \Core\Model
       return $stmt->fetchColumn();
    }
 
+   /**
+    * Incomes update
+    * 
+    * @return void
+    */
    public static function incomeUpdate($data)
    {
       $user = Auth::getUser();
@@ -223,6 +305,12 @@ class UserIncome extends \Core\Model
       $stmt->execute();
    }
 
+   /**
+    * 
+    * Display of income categories
+    * 
+    * @return array
+    */
    public static function incomeCategory()
    {
       $user = Auth::getUser();
@@ -241,6 +329,108 @@ class UserIncome extends \Core\Model
       return $stmt->fetchAll(PDO::FETCH_ASSOC);
    }
 
+   /**
+    * Save a new category of income
+    * 
+    * @return void
+    */
+   public static function incomeAddCategory($category)
+   {
+      $user = Auth::getUser();
+
+      $sql = "INSERT INTO incomes_category_assigned_to_users (user_id, name)
+               VALUES (:user_id, :name)";
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+
+      $stmt->bindValue(':user_id', $user->id, PDO::PARAM_INT);
+      $stmt->bindValue(':name', $category, PDO::PARAM_STR);
+
+      $stmt->execute();
+   }
+
+   /**
+    * Save the new income category name
+    *
+    * @return void
+    */
+   public static function incomeRename($new_category)
+   {
+
+      $user = Auth::getUser();
+
+      $sql = "UPDATE incomes_category_assigned_to_users
+              SET name = :new_category
+              WHERE user_id = :user_id
+              AND
+              name = :name";
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+
+      $stmt->bindValue(':user_id', $user->id, PDO::PARAM_INT);
+      $stmt->bindValue(':new_category', $new_category, PDO::PARAM_STR);
+      $stmt->bindValue(':name', $_POST['income_name'], PDO::PARAM_STR);
+
+      $stmt->execute();
+   }
+
+   /**
+    * Deleting the selected income category
+    *
+    * @return void
+    */
+   public static function categoryDelete()
+   {
+      static::updateTheDeletedCategory();
+
+      $user = Auth::getUser();
+
+      $sql = "DELETE FROM incomes_category_assigned_to_users
+             WHERE user_id = :user_id
+             AND
+             name = :category";
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+
+      $stmt->bindValue(':user_id', $user->id, PDO::PARAM_INT);
+      $stmt->bindValue(':category', $_POST["income_name"], PDO::PARAM_STR);
+
+      $stmt->execute();
+   }
+
+   /**
+    * Change a deleted category to an existing one
+    *
+    * @return void
+    */
+   public static function updateTheDeletedCategory()
+   {
+      $user = Auth::getUser();
+
+      $sql = "UPDATE incomes
+              SET income_category_assigned_to_user_id = (SELECT id FROM incomes_category_assigned_to_users WHERE user_id = :user_id 
+              AND name != :removed_category LIMIT 1)
+              WHERE user_id = :user_id
+              AND income_category_assigned_to_user_id = (SELECT id FROM incomes_category_assigned_to_users WHERE user_id = :user_id 
+              AND name = :removed_category)";
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+
+      $stmt->bindValue(':user_id', $user->id, PDO::PARAM_INT);
+      $stmt->bindValue(':removed_category', $_POST["income_name"], PDO::PARAM_STR);
+
+      $stmt->execute();
+   }
+
+   /**
+    * Remove of incomes
+    *
+    * @return void
+    */
    public static function incomeDelete($data)
    {
       $sql = "DELETE FROM incomes
@@ -250,6 +440,26 @@ class UserIncome extends \Core\Model
       $stmt = $db->prepare($sql);
 
       $stmt->bindValue(':id', $data["delete"], PDO::PARAM_INT);
+
+      $stmt->execute();
+   }
+
+   /**
+    * Delete incomes and categories for the selected user
+    *
+    * @return void
+    */
+   public static function deleteAccount()
+   {
+      $user = Auth::getUser();
+
+      $sql = "DELETE FROM `incomes_category_assigned_to_users` WHERE user_id = :user_id;
+      DELETE FROM `incomes` WHERE user_id = :user_id;";
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+
+      $stmt->bindValue(':user_id', $user->id, PDO::PARAM_INT);
 
       $stmt->execute();
    }
