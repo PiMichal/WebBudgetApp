@@ -75,6 +75,11 @@ class UserIncome extends \Core\Model
       }
    }
 
+   /**
+    * See if a user record already exists with the specified category
+    * 
+    * @return boolean True if a record already exists with specified category, false otherwise
+    */
    public function findByCategory($category)
    {
       $user = Auth::getUser();
@@ -98,7 +103,6 @@ class UserIncome extends \Core\Model
       } else {
          return true;
       }
-
    }
 
    /**
@@ -131,7 +135,6 @@ class UserIncome extends \Core\Model
       }
 
       return true;
-
    }
 
    /**
@@ -190,6 +193,11 @@ class UserIncome extends \Core\Model
       return false;
    }
 
+   /**
+    * Display of user incomes over a specified period
+    * 
+    * @return array
+    */
    public static function getIncome($start_date, $end_date)
    {
       $user = Auth::getUser();
@@ -213,6 +221,11 @@ class UserIncome extends \Core\Model
       return $stmt->fetchAll();
    }
 
+   /**
+    * View detailed user incomes over a specified period
+    * 
+    * @return array
+    */
    public static function getAllIncome($start_date, $end_date)
    {
       $user = Auth::getUser();
@@ -236,6 +249,11 @@ class UserIncome extends \Core\Model
       return $stmt->fetchAll();
    }
 
+   /**
+    * Calculation of the sum of the user's incomes in a given period
+    * 
+    * @return string
+    */
    public static function countTotalIncome($start_date, $end_date)
    {
       $user = Auth::getUser();
@@ -258,6 +276,11 @@ class UserIncome extends \Core\Model
       return $stmt->fetchColumn();
    }
 
+   /**
+    * Incomes update
+    * 
+    * @return void
+    */
    public static function incomeUpdate($data)
    {
       $user = Auth::getUser();
@@ -282,6 +305,12 @@ class UserIncome extends \Core\Model
       $stmt->execute();
    }
 
+   /**
+    * 
+    * Display of income categories
+    * 
+    * @return array
+    */
    public static function incomeCategory()
    {
       $user = Auth::getUser();
@@ -300,6 +329,11 @@ class UserIncome extends \Core\Model
       return $stmt->fetchAll(PDO::FETCH_ASSOC);
    }
 
+   /**
+    * Save a new category of income
+    * 
+    * @return void
+    */
    public static function incomeAddCategory($category)
    {
       $user = Auth::getUser();
@@ -316,6 +350,11 @@ class UserIncome extends \Core\Model
       $stmt->execute();
    }
 
+   /**
+    * Save the new income category name
+    *
+    * @return void
+    */
    public static function incomeRename($new_category)
    {
 
@@ -337,10 +376,15 @@ class UserIncome extends \Core\Model
       $stmt->execute();
    }
 
+   /**
+    * Deleting the selected income category
+    *
+    * @return void
+    */
    public static function categoryDelete()
    {
       static::updateTheDeletedCategory();
-      
+
       $user = Auth::getUser();
 
       $sql = "DELETE FROM incomes_category_assigned_to_users
@@ -357,6 +401,11 @@ class UserIncome extends \Core\Model
       $stmt->execute();
    }
 
+   /**
+    * Change a deleted category to an existing one
+    *
+    * @return void
+    */
    public static function updateTheDeletedCategory()
    {
       $user = Auth::getUser();
@@ -375,9 +424,13 @@ class UserIncome extends \Core\Model
       $stmt->bindValue(':removed_category', $_POST["income_name"], PDO::PARAM_STR);
 
       $stmt->execute();
-
    }
 
+   /**
+    * Remove of incomes
+    *
+    * @return void
+    */
    public static function incomeDelete($data)
    {
       $sql = "DELETE FROM incomes
@@ -391,5 +444,23 @@ class UserIncome extends \Core\Model
       $stmt->execute();
    }
 
+   /**
+    * Delete incomes and categories for the selected user
+    *
+    * @return void
+    */
+   public static function deleteAccount()
+   {
+      $user = Auth::getUser();
 
+      $sql = "DELETE FROM `incomes_category_assigned_to_users` WHERE user_id = :user_id;
+      DELETE FROM `incomes` WHERE user_id = :user_id;";
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+
+      $stmt->bindValue(':user_id', $user->id, PDO::PARAM_INT);
+
+      $stmt->execute();
+   }
 }

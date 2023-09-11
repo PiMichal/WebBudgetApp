@@ -6,6 +6,7 @@ use App\Mail;
 use PDO;
 use \App\Token;
 use Core\View;
+use App\Auth;
 
 /**
  * User model
@@ -99,9 +100,9 @@ class User extends \Core\Model
     }
 
     /**
-     * Get all the users as an associative array
+     * Adding a new user to the database
      *
-     * @return array
+     * @return void
      */
     public function save()
     {
@@ -145,10 +146,9 @@ class User extends \Core\Model
         if (static::emailExists($this->email, $this->id ?? null)) {
             $this->errors[] = 'email already taken';
         }
-
     }
 
-     /**
+    /**
      * Validate current property values, adding valitation error messages to the errors array property
      * 
      * @return void
@@ -193,7 +193,7 @@ class User extends \Core\Model
 
         return false;
     }
-    
+
     /**
      * Find a user model by email address
      * 
@@ -431,9 +431,9 @@ class User extends \Core\Model
     }
 
     /**
-     * Get all the users as an associative array
+     * Update your account details
      *
-     * @return array
+     * @return void
      */
     public function update()
     {
@@ -459,6 +459,11 @@ class User extends \Core\Model
         return false;
     }
 
+    /**
+     * Password update
+     *
+     * @return void
+     */
     public function updatePassword()
     {
         $this->id = $_SESSION['user_id'];
@@ -487,5 +492,24 @@ class User extends \Core\Model
             return $stmt->execute();
         }
         return false;
+    }
+
+    /**
+     * Deleting a user account
+     *
+     * @return void
+     */
+    public static function deleteAccount()
+    {
+        $user = Auth::getUser();
+
+        $sql = "DELETE FROM `users` WHERE id = :id";
+
+        $db = static::getDB();
+        $stmt = $db->prepare($sql);
+
+        $stmt->bindValue(':id', $user->id, PDO::PARAM_INT);
+
+        $stmt->execute();
     }
 }

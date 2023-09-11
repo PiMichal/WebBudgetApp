@@ -7,7 +7,7 @@ use Core\View;
 use App\Flash;
 
 /**
- * Income controller
+ * Balance controller
  * 
  * PHP version 7.0
  */
@@ -22,12 +22,12 @@ class Balance extends Authenticated
     public function newAction()
     {
 
-        $data = New UserBalance();
+        $data = new UserBalance();
 
         $incomeData = $data->getIncome();
 
         $countTotalIncome = $data->countTotalIncome();
-        
+
         $expenseData = $data->getExpense();
         $countTotalExpense = $data->countTotalExpense();
 
@@ -41,22 +41,26 @@ class Balance extends Authenticated
             'calculatedBalance' => $calculatedBalance,
             'date' => $data
         ]);
-
     }
 
+    /**
+     * Displaying data from a specific period
+     * 
+     * @return void
+     */
     public function dateAction()
     {
 
-        $data = New UserBalance();
+        $data = new UserBalance();
 
         if ($data->getIncome() || $data->getExpense()) {
 
             $incomeData = $data->getIncome();
             $countTotalIncome = $data->countTotalIncome();
-            
+
             $expenseData = $data->getExpense();
             $countTotalExpense = $data->countTotalExpense();
-    
+
             $calculatedBalance = $data->grandTotal();
 
             View::renderTemplate('Balance/show.html', [
@@ -67,7 +71,6 @@ class Balance extends Authenticated
                 'calculatedBalance' => $calculatedBalance,
                 'date' => $_POST
             ]);
-
         } else {
 
             View::renderTemplate('Balance/show.html', [
@@ -76,13 +79,18 @@ class Balance extends Authenticated
         }
     }
 
+    /**
+     * Show detailed income data
+     * 
+     * @return void
+     */
     public function incomeDetailsAction()
     {
 
-        $data = New UserBalance();
-        
+        $data = new UserBalance();
+
         $incomeData = $data->getAllIncome();
-        
+
         $countTotalIncome = $data->countTotalIncome();
 
         View::renderTemplate('Balance/showIncomeDetails.html', [
@@ -90,15 +98,19 @@ class Balance extends Authenticated
             'countTotalIncome' => $countTotalIncome,
             'date' => $data
         ]);
-
     }
-    
+
+    /**
+     * Edit income details
+     * 
+     * @return void
+     */
     public function incomeEditAction()
     {
 
-        
-        $data = New UserBalance();
-        
+
+        $data = new UserBalance();
+
         $id = $_POST["edit"];
         $incomeData = $data->getAllIncome();
         $category = $data->incomeCategory();
@@ -112,20 +124,24 @@ class Balance extends Authenticated
             'date' => $data,
             'category' => $category
         ]);
-
     }
 
+    /**
+     * Update the selected income item
+     * 
+     * @return void
+     */
     public function incomeUpdateAction()
     {
 
-        $data = New UserBalance();
+        $data = new UserBalance();
 
         $data->incomeUpdate();
 
         $incomeData = $data->getAllIncome();
 
         $countTotalIncome = $data->countTotalIncome();
-        
+
         Flash::addMessage('Successfully updated data');
         View::renderTemplate('Balance/showIncomeDetails.html', [
             'incomeData' => $incomeData,
@@ -133,18 +149,22 @@ class Balance extends Authenticated
             'editNumber' => $_POST["id"],
             'date' => $data
         ]);
-
     }
 
+    /**
+     * Delete the selected income item
+     * 
+     * @return void
+     */
     public function incomeDeleteAction()
     {
 
-        $data = New UserBalance();
-        
+        $data = new UserBalance();
+
         $data->incomeDelete();
 
         $incomeData = $data->getAllIncome();
-        
+
         $countTotalIncome = $data->countTotalIncome();
         Flash::addMessage('Successful deletion of data', Flash::INFO);
         View::renderTemplate('Balance/showIncomeDetails.html', [
@@ -154,13 +174,18 @@ class Balance extends Authenticated
         ]);
     }
 
+    /**
+     * Show detailed expense data
+     * 
+     * @return void
+     */
     public function expenseDetailsAction()
     {
 
-        $data = New UserBalance();
-        
+        $data = new UserBalance();
+
         $expenseData = $data->getAllExpense();
-        
+
         $countTotalExpense = $data->countTotalExpense();
 
         View::renderTemplate('Balance/showExpenseDetails.html', [
@@ -170,9 +195,14 @@ class Balance extends Authenticated
         ]);
     }
 
+    /**
+     * Edit expense details
+     * 
+     * @return void
+     */
     public function expenseEditAction()
     {
-        $data = New UserBalance();
+        $data = new UserBalance();
 
         $id = $_POST["edit"];
         $expenseData = $data->getAllExpense();
@@ -190,10 +220,15 @@ class Balance extends Authenticated
         ]);
     }
 
+    /**
+     * Update the selected expense item
+     * 
+     * @return void
+     */
     public function expenseUpdateAction()
     {
 
-        $data = New UserBalance();
+        $data = new UserBalance();
 
         $data->expenseUpdate();
 
@@ -208,18 +243,22 @@ class Balance extends Authenticated
             'editNumber' => $_POST["id"],
             'date' => $data
         ]);
-
     }
 
+    /**
+     * Delete the selected expense item
+     * 
+     * @return void
+     */
     public function expenseDeleteAction()
     {
 
-        $data = New UserBalance();
-        
+        $data = new UserBalance();
+
         $data->expenseDelete();
 
         $expenseData = $data->getAllExpense();
-        
+
         $countTotalExpense = $data->countTotalExpense();
 
         Flash::addMessage('Successful deletion of data', Flash::INFO);
@@ -229,5 +268,4 @@ class Balance extends Authenticated
             'date' => $data
         ]);
     }
-
 }
