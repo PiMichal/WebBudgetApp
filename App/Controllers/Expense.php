@@ -21,9 +21,13 @@ class Expense extends Authenticated
      */
     public function newAction()
     {   
+        $date = new UserExpense();
+        $date->dateSetting();
+
         View::renderTemplate('Expense/new.html', [
             'category' => UserExpense::expenseCategory(),
-            'payment_methods' => UserExpense::paymentMethods()
+            'payment_methods' => UserExpense::paymentMethods(),
+            'expense' => $date
         ]);
     }
 

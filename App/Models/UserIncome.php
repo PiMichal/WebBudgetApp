@@ -39,6 +39,18 @@ class UserIncome extends \Core\Model
    public $income_comment;
 
    /**
+    * Start date
+    * @var string
+    */
+    public $start_date;
+
+    /**
+     * End date
+     * @var string
+     */
+    public $end_date;
+    
+   /**
     * Error messages
     * 
     * @var array
@@ -198,8 +210,10 @@ class UserIncome extends \Core\Model
     * 
     * @return array
     */
-   public static function getIncome($start_date, $end_date)
+   public function getIncome()
    {
+      $this->dateSetting();
+
       $user = Auth::getUser();
 
       $sql = "SELECT incomes.id, incomes_category_assigned_to_users.name AS income_name, SUM(amount) AS income_amount, date_of_income, income_comment  
@@ -213,8 +227,8 @@ class UserIncome extends \Core\Model
       $stmt = $db->prepare($sql);
 
       $stmt->bindValue(':userId', $user->id, PDO::PARAM_INT);
-      $stmt->bindValue(':startDate', $start_date, PDO::PARAM_STR);
-      $stmt->bindValue(':endDate', $end_date, PDO::PARAM_STR);
+      $stmt->bindValue(':startDate', $this->start_date, PDO::PARAM_STR);
+      $stmt->bindValue(':endDate', $this->end_date, PDO::PARAM_STR);
 
       $stmt->execute();
 
@@ -226,8 +240,10 @@ class UserIncome extends \Core\Model
     * 
     * @return array
     */
-   public static function getAllIncome($start_date, $end_date)
+   public function getAllIncome()
    {
+      $this->dateSetting();
+      
       $user = Auth::getUser();
 
       $sql = "SELECT incomes.id, incomes_category_assigned_to_users.name AS income_name, amount AS income_amount, date_of_income, income_comment  
@@ -241,8 +257,8 @@ class UserIncome extends \Core\Model
       $stmt = $db->prepare($sql);
 
       $stmt->bindValue(':userId', $user->id, PDO::PARAM_INT);
-      $stmt->bindValue(':startDate', $start_date, PDO::PARAM_STR);
-      $stmt->bindValue(':endDate', $end_date, PDO::PARAM_STR);
+      $stmt->bindValue(':startDate', $this->start_date, PDO::PARAM_STR);
+      $stmt->bindValue(':endDate', $this->end_date, PDO::PARAM_STR);
 
       $stmt->execute();
 
@@ -254,8 +270,10 @@ class UserIncome extends \Core\Model
     * 
     * @return string
     */
-   public static function countTotalIncome($start_date, $end_date)
+   public function countTotalIncome()
    {
+      $this->dateSetting();
+
       $user = Auth::getUser();
 
       $sql = "SELECT SUM(amount) AS income_sum
@@ -268,8 +286,8 @@ class UserIncome extends \Core\Model
       $stmt = $db->prepare($sql);
 
       $stmt->bindValue(':userId', $user->id, PDO::PARAM_INT);
-      $stmt->bindValue(':startDate', $start_date, PDO::PARAM_STR);
-      $stmt->bindValue(':endDate', $end_date, PDO::PARAM_STR);
+      $stmt->bindValue(':startDate', $this->start_date, PDO::PARAM_STR);
+      $stmt->bindValue(':endDate', $this->end_date, PDO::PARAM_STR);
 
       $stmt->execute();
 
@@ -281,7 +299,7 @@ class UserIncome extends \Core\Model
     * 
     * @return void
     */
-   public static function incomeUpdate($data)
+   public static function incomeUpdate()
    {
       $user = Auth::getUser();
 
@@ -296,11 +314,11 @@ class UserIncome extends \Core\Model
       $stmt = $db->prepare($sql);
 
       $stmt->bindValue(':user_id', $user->id, PDO::PARAM_INT);
-      $stmt->bindValue(':income_category_assigned_to_user_id', $data["income_category_assigned_to_user_id"], PDO::PARAM_STR);
-      $stmt->bindValue(':amount', $data["income_amount"], PDO::PARAM_STR);
-      $stmt->bindValue(':date_of_income', $data["date_of_income"], PDO::PARAM_STR);
-      $stmt->bindValue(':income_comment', $data["income_comment"], PDO::PARAM_STR);
-      $stmt->bindValue(':id', $data["id"], PDO::PARAM_INT);
+      $stmt->bindValue(':income_category_assigned_to_user_id', $_POST["income_category_assigned_to_user_id"], PDO::PARAM_STR);
+      $stmt->bindValue(':amount', $_POST["income_amount"], PDO::PARAM_STR);
+      $stmt->bindValue(':date_of_income', $_POST["date_of_income"], PDO::PARAM_STR);
+      $stmt->bindValue(':income_comment', $_POST["income_comment"], PDO::PARAM_STR);
+      $stmt->bindValue(':id', $_POST["id"], PDO::PARAM_INT);
 
       $stmt->execute();
    }
@@ -431,7 +449,7 @@ class UserIncome extends \Core\Model
     *
     * @return void
     */
-   public static function incomeDelete($data)
+   public static function incomeDelete()
    {
       $sql = "DELETE FROM incomes
              WHERE id = :id";
@@ -439,7 +457,7 @@ class UserIncome extends \Core\Model
       $db = static::getDB();
       $stmt = $db->prepare($sql);
 
-      $stmt->bindValue(':id', $data["delete"], PDO::PARAM_INT);
+      $stmt->bindValue(':id', $_POST["delete"], PDO::PARAM_INT);
 
       $stmt->execute();
    }
@@ -463,4 +481,23 @@ class UserIncome extends \Core\Model
 
       $stmt->execute();
    }
+
+   /**
+     * Setting the right date
+     * 
+     * @return void
+     */
+    public function dateSetting()
+    {
+
+        if (isset($_POST["start_date"]) && isset($_POST["end_date"])) {
+            $this->start_date = $_POST['start_date'];
+            $this->end_date = $_POST['end_date'];
+        } else {
+            $this->start_date = date('Y-m-01');
+            $this->end_date = date('Y-m-t');
+        }
+
+        $this->date_of_income = date('Y-m-d');
+    }
 }

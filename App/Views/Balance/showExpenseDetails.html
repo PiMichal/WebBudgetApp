@@ -141,33 +141,11 @@
           
           {% for info in expenseData %}
           <tr>
-            <td><input type="date" class="text-center" name="date_of_expense" value="{{ info.date_of_expense }}" disabled></td>
-            <td>				
-              <select class="text" name="expense_category_assigned_to_user_id" disabled>
-              {% set defaultCategory = info.expense_name %}
-              {% for info in expenseData %}
-              {% if defaultCategory == info.expense_name %}
-              <option selected>{{ info.expense_name}}</option>
-              {% else %}
-              <option>{{ info.expense_name}}</option>
-              {% endif %}
-              {% endfor %}
-              </select>
-            </td>
-            <td>				
-                <select class="text" name="payment_method_assigned_to_user_id" disabled>
-                {% set defaultPaymentMethod = info.payment_methods %}
-                {% for info in expenseData %}
-                {% if defaultPaymentMethod == info.payment_methods %}
-                <option selected>{{ info.payment_methods}}</option>
-                {% else %}
-                <option>{{ info.payment_methods}}</option>
-                {% endif %}
-                {% endfor %}
-                </select>
-            </td>
-            <td><textarea name="expense_comment" disabled>{{ info.expense_comment}}</textarea></td>
-            <td><input type="number" class="text-center"  name="expense_amount" step="0.01" value="{{ info.expense_amount}}" disabled></td>
+            <td>{{ info.date_of_expense }}</td>
+            <td>{{ info.expense_name}}</td>
+            <td>{{ info.payment_methods}}</td>
+            <td>{{ info.expense_comment}}</td>
+            <td>{{ info.expense_amount}}</td>
             <td>
               <button type="submit" class="btn btn-link btn-sm mx-1" name="edit" value="{{ info.id }}" formaction="/balance/expenseEdit">
                 <svg xmlns="http://www.w3.org/2000/svg" height="25" class="bi bi-pencil-square" fill="#ffc107"

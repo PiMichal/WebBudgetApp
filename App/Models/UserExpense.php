@@ -45,6 +45,18 @@ class UserExpense extends \Core\Model
    public $expense_comment;
 
    /**
+    * Start date
+    * @var string
+    */
+    public $start_date;
+
+    /**
+     * End date
+     * @var string
+     */
+    public $end_date;
+
+   /**
     * Error messages
     * 
     * @var array
@@ -265,8 +277,10 @@ class UserExpense extends \Core\Model
     * 
     * @return array
     */
-   public static function getExpense($start_date, $end_date)
+   public function getExpense()
    {
+      $this->dateSetting();
+
       $user = Auth::getUser();
 
       $sql = "SELECT name AS expense_name, SUM(amount) AS expense_amount, date_of_expense, expense_comment 
@@ -281,8 +295,8 @@ class UserExpense extends \Core\Model
       $stmt = $db->prepare($sql);
 
       $stmt->bindValue(':userId', $user->id, PDO::PARAM_INT);
-      $stmt->bindValue(':startDate', $start_date, PDO::PARAM_STR);
-      $stmt->bindValue(':endDate', $end_date, PDO::PARAM_STR);
+      $stmt->bindValue(':startDate', $this->start_date, PDO::PARAM_STR);
+      $stmt->bindValue(':endDate', $this->end_date, PDO::PARAM_STR);
 
       $stmt->execute();
 
@@ -294,8 +308,10 @@ class UserExpense extends \Core\Model
     * 
     * @return array
     */
-   public static function getAllExpense($start_date, $end_date)
+   public function getAllExpense()
    {
+      $this->dateSetting();
+
       $user = Auth::getUser();
 
       $sql = "SELECT expenses.id, expenses_category_assigned_to_users.name AS expense_name, amount AS expense_amount, date_of_expense, expense_comment, payment_methods_assigned_to_users.name AS payment_methods 
@@ -310,8 +326,8 @@ class UserExpense extends \Core\Model
       $stmt = $db->prepare($sql);
 
       $stmt->bindValue(':userId', $user->id, PDO::PARAM_INT);
-      $stmt->bindValue(':startDate', $start_date, PDO::PARAM_STR);
-      $stmt->bindValue(':endDate', $end_date, PDO::PARAM_STR);
+      $stmt->bindValue(':startDate', $this->start_date, PDO::PARAM_STR);
+      $stmt->bindValue(':endDate', $this->end_date, PDO::PARAM_STR);
 
       $stmt->execute();
 
@@ -323,8 +339,9 @@ class UserExpense extends \Core\Model
     * 
     * @return string
     */
-   public static function countTotalExpense($start_date, $end_date)
+   public function countTotalExpense()
    {
+      $this->dateSetting();
       $user = Auth::getUser();
 
       $sql = "SELECT SUM(amount) AS expense_sum
@@ -337,8 +354,8 @@ class UserExpense extends \Core\Model
       $stmt = $db->prepare($sql);
 
       $stmt->bindValue(':userId', $user->id, PDO::PARAM_INT);
-      $stmt->bindValue(':startDate', $start_date, PDO::PARAM_STR);
-      $stmt->bindValue(':endDate', $end_date, PDO::PARAM_STR);
+      $stmt->bindValue(':startDate', $this->start_date, PDO::PARAM_STR);
+      $stmt->bindValue(':endDate', $this->end_date, PDO::PARAM_STR);
 
       $stmt->execute();
 
@@ -350,7 +367,7 @@ class UserExpense extends \Core\Model
     * 
     * @return void
     */
-   public static function expenseUpdate($data)
+   public static function expenseUpdate()
    {
       $user = Auth::getUser();
       $sql = "UPDATE expenses
@@ -365,12 +382,12 @@ class UserExpense extends \Core\Model
       $stmt = $db->prepare($sql);
 
       $stmt->bindValue(':user_id', $user->id, PDO::PARAM_INT);
-      $stmt->bindValue(':expense_category_assigned_to_user_id', $data["expense_category_assigned_to_user_id"], PDO::PARAM_STR);
-      $stmt->bindValue(':amount', $data["expense_amount"], PDO::PARAM_STR);
-      $stmt->bindValue(':date_of_expense', $data["date_of_expense"], PDO::PARAM_STR);
-      $stmt->bindValue(':expense_comment', $data["expense_comment"], PDO::PARAM_STR);
-      $stmt->bindValue(':payment_method_assigned_to_user_id', $data["payment_method_assigned_to_user_id"], PDO::PARAM_STR);
-      $stmt->bindValue(':id', $data["id"], PDO::PARAM_INT);
+      $stmt->bindValue(':expense_category_assigned_to_user_id', $_POST["expense_category_assigned_to_user_id"], PDO::PARAM_STR);
+      $stmt->bindValue(':amount', $_POST["expense_amount"], PDO::PARAM_STR);
+      $stmt->bindValue(':date_of_expense', $_POST["date_of_expense"], PDO::PARAM_STR);
+      $stmt->bindValue(':expense_comment', $_POST["expense_comment"], PDO::PARAM_STR);
+      $stmt->bindValue(':payment_method_assigned_to_user_id', $_POST["payment_method_assigned_to_user_id"], PDO::PARAM_STR);
+      $stmt->bindValue(':id', $_POST["id"], PDO::PARAM_INT);
 
       $stmt->execute();
    }
@@ -501,7 +518,7 @@ class UserExpense extends \Core\Model
     *
     * @return void
     */
-   public static function expenseDelete($data)
+   public static function expenseDelete()
    {
       $sql = "DELETE FROM expenses
              WHERE id = :id";
@@ -509,7 +526,7 @@ class UserExpense extends \Core\Model
       $db = static::getDB();
       $stmt = $db->prepare($sql);
 
-      $stmt->bindValue(':id', $data["delete"], PDO::PARAM_INT);
+      $stmt->bindValue(':id', $_POST["delete"], PDO::PARAM_INT);
 
       $stmt->execute();
    }
@@ -653,4 +670,23 @@ class UserExpense extends \Core\Model
 
       $stmt->execute();
    }
+
+   /**
+     * Setting the right date
+     * 
+     * @return void
+     */
+    public function dateSetting()
+    {
+
+        if (isset($_POST["start_date"]) && isset($_POST["end_date"])) {
+            $this->start_date = $_POST['start_date'];
+            $this->end_date = $_POST['end_date'];
+        } else {
+            $this->start_date = date('Y-m-01');
+            $this->end_date = date('Y-m-t');
+        }
+        
+        $this->date_of_expense = date('Y-m-d');
+    }
 }

@@ -140,21 +140,10 @@
           
           {% for info in incomeData %}
           <tr>
-            <td><input type="date" class="text-center" name="date_of_income" value="{{ info.date_of_income }}" disabled></td>
-            <td>				
-              <select class="text" name="income_category_assigned_to_user_id" disabled>
-              {% set defaultCategory = info.income_name %}
-              {% for info in incomeData %}
-              {% if defaultCategory == info.income_name %}
-              <option selected>{{ info.income_name}}</option>
-              {% else %}
-              <option>{{ info.income_name}}</option>
-              {% endif %}
-              {% endfor %}
-              </select>
-            </td>
-            <td><textarea name="income_comment" disabled>{{ info.income_comment}}</textarea></td>
-            <td><input type="number" class="text-center"  name="income_amount" step="0.01" value="{{ info.income_amount}}" disabled></td>
+            <td>{{ info.date_of_income }}</td>
+            <td>{{ info.income_name}}</td>
+            <td>{{ info.income_comment}}</td>
+            <td>{{ info.income_amount}}</td>
             <td>
               <button type="submit" class="btn btn-link btn-sm mx-1" name="edit" value="{{ info.id }}" formaction="/balance/incomeEdit">
                 <svg xmlns="http://www.w3.org/2000/svg" height="25" class="bi bi-pencil-square" fill="#ffc107"

@@ -179,59 +179,13 @@
               </button>
         </td>
           </tr>
-          {% else %}
-          <tr>
-            <td><input type="date" class="text-center" name="date_of_expense" value="{{ info.date_of_expense  }}" disabled></td>
-            <td>				
-              <select class="text" name="expense_category_assigned_to_user_id" disabled>
-              {% set defaultCategory = info.expense_name %}
-              {% for info in category %}
-              {% if defaultCategory == info.expense_name %}
-              <option selected>{{ info.expense_name}}</option>
-              {% else %}
-              <option>{{ info.expense_name}}</option>
-              {% endif %}
-              {% endfor %}
-              </select>
-            </td>
-            <td>				
-                <select class="text" name="payment_method_assigned_to_user_id" disabled>
-                {% set defaultPaymentMethod = info.payment_methods %}
-                {% for info in paymentMethods %}
-                {% if defaultPaymentMethod == info.payment_methods %}
-                <option selected>{{ info.payment_methods}}</option>
-                {% else %}
-                <option>{{ info.payment_methods}}</option>
-                {% endif %}
-                {% endfor %}
-                </select>
-            </td>
-            <td><textarea name="expense_comment" disabled>{{ info.expense_comment}}</textarea></td>
-            <td><input type="number" class="text-center" name="expense_amount" step="0.01" value="{{ info.expense_amount}}" disabled></td>
-            <td>
-              <button type="submit" class="btn btn-link btn-sm mx-1" name="edit" value="{{ info.id }}" formaction="/balance/expenseEdit">
-                <svg xmlns="http://www.w3.org/2000/svg" height="25" class="bi bi-pencil-square" fill="#ffc107"
-                  viewbox="0 0 16 16">
-                  <path
-                    d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
-                  <path fill-rule="evenodd"
-                    d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
-                </svg>
-              </button>
-        </td>
-          </tr>
           {% endif %}
           {% endfor %}
 
         </tbody>
-        <tfoot>
-          <tr>
-            <th colspan="6">TOTAL: <span class="text-success">+{{ countTotalExpense }} $</span> </th>
-          </tr>
-        </tfoot>
       </table>
     </div>
-      <button class="btn btn-danger col-md-4" type="submit" id="cancel" formaction="/balance/new">Cancel</button>
+      <button class="btn btn-danger col-md-4" type="submit" id="cancel" formaction="/balance/expenseDetails">Cancel</button>
       <button class="btn btn-success col-md-4 mx-3" type="submit" name="id" value="{{ id }}" formaction="/balance/expenseUpdate">Save</button>
   </form>
   </main>

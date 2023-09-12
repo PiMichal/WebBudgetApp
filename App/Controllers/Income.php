@@ -5,7 +5,6 @@ namespace App\Controllers;
 use Core\View;
 use App\Models\UserIncome;
 use App\Flash;
-use App\Models\UserBalance;
 
 /**
  * Income controller
@@ -14,7 +13,7 @@ use App\Models\UserBalance;
  */
 
 class Income extends Authenticated
-{
+{   
     /**
      * Show the income page
      * 
@@ -22,8 +21,12 @@ class Income extends Authenticated
      */
     public function newAction()
     {
+        $date = new UserIncome();
+        $date->dateSetting();
+        
         View::renderTemplate('Income/new.html', [
-            'category' => UserIncome::incomeCategory()
+            'category' => UserIncome::incomeCategory(),
+            'income' => $date
         ]);
     }
 
@@ -51,4 +54,6 @@ class Income extends Authenticated
         }
 
     }
+
+    
 }
