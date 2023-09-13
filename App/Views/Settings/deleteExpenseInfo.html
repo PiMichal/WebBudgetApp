@@ -95,7 +95,7 @@
                 <div class="mb-3 text-center">
 					<button class="btn btn-success m-5" type="submit" id="cancel"
 						formaction="/settings/expenseDelete">Don't delete categories</button>
-					<button class="btn btn-danger" type="submit" formaction="/settings/removeExpenseCategory">Yes, remove the category</button>
+					<button class="btn btn-danger" type="submit" formaction="/settings/removeExpenseCategory" name="expense_name" value="{{ category }}">Yes, remove the category</button>
 				</div>
 			</form>
 		</main>

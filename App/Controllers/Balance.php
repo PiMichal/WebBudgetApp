@@ -7,60 +7,75 @@ use App\Flash;
 use App\Models\UserExpense;
 use App\Models\UserIncome;
 
-
 class Balance extends Authenticated
 {
 
     public function newAction()
     {
-        $incomeData = new UserIncome();
-        $expenseData = new UserExpense();
+        if (!empty(UserIncome::getIncome()) && !empty(UserExpense::getExpense())) {
 
-        $income = $incomeData->getIncome();
+            $calculatedBalance = UserIncome::countTotalIncome() - UserExpense::countTotalExpense();
 
-        $countTotalIncome = $incomeData->countTotalIncome();
+            View::renderTemplate('Balance/show.html', [
+                'incomeData' => UserIncome::getIncome(),
+                'expenseData' => UserExpense::getExpense(),
+                'countTotalIncome' => UserIncome::countTotalIncome(),
+                'countTotalExpense' => UserExpense::countTotalExpense(),
+                'calculatedBalance' => $calculatedBalance,
+                'date' => UserIncome::dateSetting()
+            ]);
+        } else if (!empty(UserIncome::getIncome()) && empty(UserExpense::getExpense())) {
+            View::renderTemplate('Balance/showExpenseEmpty.html', [
+                'incomeData' => UserIncome::getIncome(),
+                'countTotalIncome' => UserIncome::countTotalIncome(),
+                'date' => UserIncome::dateSetting()
+            ]);
+        } else if (empty(UserIncome::getIncome()) && !empty(UserExpense::getExpense())) {
 
-        $expense = $expenseData->getExpense();
-        $countTotalExpense = $expenseData->countTotalExpense();
-
-        $calculatedBalance = $incomeData->countTotalIncome() - $expenseData->countTotalExpense();
-
-        View::renderTemplate('Balance/show.html', [
-            'incomeData' => $income,
-            'expenseData' => $expense,
-            'countTotalIncome' => $countTotalIncome,
-            'countTotalExpense' => $countTotalExpense,
-            'calculatedBalance' => $calculatedBalance,
-            'date' => $incomeData
-        ]);
+            View::renderTemplate('Balance/showIncomeEmpty.html', [
+                'expenseData' => UserExpense::getExpense(),
+                'countTotalExpense' => UserExpense::countTotalExpense(),
+                'date' => UserExpense::dateSetting()
+            ]);
+        } else {
+            View::renderTemplate('Balance/showEmpty.html', [
+                'date' => UserExpense::dateSetting()
+            ]);
+        }
     }
 
     public function dateAction()
     {
-        $incomeData = new UserIncome();
-        $expenseData = new UserExpense();
 
-        if ($incomeData->getIncome() || $expenseData->getExpense()) {
+        if (!empty(UserIncome::getIncome()) && !empty(UserExpense::getExpense())) {
 
-            $income = $incomeData->getIncome();
-            $countTotalIncome = $incomeData->countTotalIncome();
-
-            $expense = $expenseData->getExpense();
-            $countTotalExpense = $expenseData->countTotalExpense();
-
-            $calculatedBalance = $incomeData->countTotalIncome() - $expenseData->countTotalExpense();
+            $calculatedBalance = UserIncome::countTotalIncome() - UserExpense::countTotalExpense();
 
             View::renderTemplate('Balance/show.html', [
-                'incomeData' => $income,
-                'expenseData' => $expense,
-                'countTotalIncome' => $countTotalIncome,
-                'countTotalExpense' => $countTotalExpense,
+                'incomeData' => UserIncome::getIncome(),
+                'expenseData' => UserExpense::getExpense(),
+                'countTotalIncome' => UserIncome::countTotalIncome(),
+                'countTotalExpense' => UserExpense::countTotalExpense(),
                 'calculatedBalance' => $calculatedBalance,
+                'date' => $_POST
+            ]);
+        } else if (!empty(UserIncome::getIncome()) && empty(UserExpense::getExpense())) {
+
+            View::renderTemplate('Balance/showExpenseEmpty.html', [
+                'incomeData' => UserIncome::getIncome(),
+                'countTotalIncome' => UserIncome::countTotalIncome(),
+                'date' => $_POST
+            ]);
+        } else if (empty(UserIncome::getIncome()) && !empty(UserExpense::getExpense())) {
+
+            View::renderTemplate('Balance/showIncomeEmpty.html', [
+                'expenseData' => UserExpense::getExpense(),
+                'countTotalExpense' => UserExpense::countTotalExpense(),
                 'date' => $_POST
             ]);
         } else {
 
-            View::renderTemplate('Balance/show.html', [
+            View::renderTemplate('Balance/showEmpty.html', [
                 'date' => $_POST
             ]);
         }
@@ -68,147 +83,102 @@ class Balance extends Authenticated
 
     public function incomeDetailsAction()
     {
-        $incomeData = new UserIncome();
-
-        $income = $incomeData->getAllIncome();
-
-        $countTotalIncome = $incomeData->countTotalIncome();
-
         View::renderTemplate('Balance/showIncomeDetails.html', [
-            'incomeData' => $income,
-            'countTotalIncome' => $countTotalIncome,
-            'date' => $incomeData
+            'incomeData' => UserIncome::getAllIncome(),
+            'countTotalIncome' => UserIncome::countTotalIncome(),
+            'date' => $_POST
         ]);
     }
 
     public function incomeEditAction()
     {
-        $incomeData = new UserIncome();
-
-        $id = $_POST["edit"];
-        $income = $incomeData->getAllIncome();
-        $category = $incomeData->incomeCategory();
-
-        $countTotalIncome = $incomeData->countTotalIncome();
-
         View::renderTemplate('Balance/incomeEdit.html', [
-            'incomeData' => $income,
-            'countTotalIncome' => $countTotalIncome,
-            'id' => $id,
-            'date' => $incomeData,
-            'category' => $category
+            'incomeData' => UserIncome::getAllIncome(),
+            'countTotalIncome' => UserIncome::countTotalIncome(),
+            'id' => $_POST["edit"],
+            'date' => $_POST,
+            'category' => UserIncome::incomeCategory()
         ]);
     }
 
     public function incomeUpdateAction()
     {
-
-        $incomeData = new UserIncome();
-
-        $incomeData->incomeUpdate();
-
-        $income = $incomeData->getAllIncome();
-
-        $countTotalIncome = $incomeData->countTotalIncome();
+        UserIncome::incomeUpdate();
 
         Flash::addMessage('Successfully updated data');
         View::renderTemplate('Balance/showIncomeDetails.html', [
-            'incomeData' => $income,
-            'countTotalIncome' => $countTotalIncome,
+            'incomeData' => UserIncome::getAllIncome(),
+            'countTotalIncome' => UserIncome::countTotalIncome(),
             'editNumber' => $_POST["id"],
-            'date' => $incomeData
+            'date' => $_POST
         ]);
     }
 
     public function incomeDeleteAction()
     {
+        UserIncome::incomeDelete();
 
-        $incomeData = new UserIncome();
-
-        $incomeData->incomeDelete();
-
-        $income = $incomeData->getAllIncome();
-
-        $countTotalIncome = $incomeData->countTotalIncome();
-        Flash::addMessage('Successful deletion of data', Flash::INFO);
-        View::renderTemplate('Balance/showIncomeDetails.html', [
-            'incomeData' => $income,
-            'countTotalIncome' => $countTotalIncome,
-            'date' => $incomeData
-        ]);
+        if (empty(UserIncome::getAllIncome())) {
+            Flash::addMessage('Successful deletion of data', Flash::INFO);
+            $this->redirect('/balance/new');
+        } else {
+            Flash::addMessage('Successful deletion of data', Flash::INFO);
+            View::renderTemplate('Balance/showIncomeDetails.html', [
+                'incomeData' => UserIncome::getAllIncome(),
+                'countTotalIncome' => UserIncome::countTotalIncome(),
+                'date' => $_POST
+            ]);
+        }
     }
 
     public function expenseDetailsAction()
     {
-        $expenseData = new UserExpense();
-
-        $expense = $expenseData->getAllExpense();
-
-        $countTotalExpense = $expenseData->countTotalExpense();
-
         View::renderTemplate('Balance/showExpenseDetails.html', [
-            'expenseData' => $expense,
-            'countTotalExpense' => $countTotalExpense,
-            'date' => $expenseData
+            'expenseData' => UserExpense::getAllExpense(),
+            'countTotalExpense' => UserExpense::countTotalExpense(),
+            'date' => $_POST
         ]);
     }
 
     public function expenseEditAction()
     {
-        $expenseData = new UserExpense();
-
-        $id = $_POST["edit"];
-        $expense = $expenseData->getAllExpense();
-        $category = $expenseData->expenseCategory();
-        $paymentMethods = $expenseData->paymentMethods();
-        $countTotalExpense = $expenseData->countTotalExpense();
-
         View::renderTemplate('Balance/expenseEdit.html', [
-            'expenseData' => $expense,
-            'countTotalExpense' => $countTotalExpense,
-            'id' => $id,
-            'date' => $expenseData,
-            'category' => $category,
-            'paymentMethods' => $paymentMethods
+            'expenseData' => UserExpense::getAllExpense(),
+            'countTotalExpense' => UserExpense::countTotalExpense(),
+            'id' => $_POST["edit"],
+            'date' => $_POST,
+            'category' => UserExpense::expenseCategory(),
+            'paymentMethods' => UserExpense::paymentMethods()
         ]);
     }
 
     public function expenseUpdateAction()
     {
-
-        $expenseData = new UserExpense();
-
-        $expenseData->expenseUpdate();
-
-        $expense = $expenseData->getAllExpense();
-
-        $countTotalExpense = $expenseData->countTotalExpense();
+        UserExpense::expenseUpdate();
 
         Flash::addMessage('Successfully updated data');
         View::renderTemplate('Balance/showExpenseDetails.html', [
-            'expenseData' => $expense,
-            'countTotalExpense' => $countTotalExpense,
+            'expenseData' => UserExpense::getAllExpense(),
+            'countTotalExpense' => UserExpense::countTotalExpense(),
             'editNumber' => $_POST["id"],
-            'date' => $expenseData
+            'date' => $_POST
         ]);
     }
 
     public function expenseDeleteAction()
     {
+        UserExpense::expenseDelete();
 
-        $expenseData = new UserExpense();
-
-        $expenseData->expenseDelete();
-
-        $expense = $expenseData->getAllExpense();
-
-        $countTotalExpense = $expenseData->countTotalExpense();
-
-        Flash::addMessage('Successful deletion of data', Flash::INFO);
-        View::renderTemplate('Balance/showExpenseDetails.html', [
-            'expenseData' => $expense,
-            'countTotalExpense' => $countTotalExpense,
-            'date' => $expenseData
-        ]);
+        if (empty(UserExpense::getAllExpense())) {
+            Flash::addMessage('Successful deletion of data', Flash::INFO);
+            $this->redirect('/balance/new');
+        } else {
+            Flash::addMessage('Successful deletion of data', Flash::INFO);
+            View::renderTemplate('Balance/showExpenseDetails.html', [
+                'expenseData' => UserExpense::getAllExpense(),
+                'countTotalExpense' => UserExpense::countTotalExpense(),
+                'date' => $_POST
+            ]);
+        }
     }
 }

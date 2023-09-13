@@ -9,29 +9,22 @@ use App\Flash;
 class Income extends Authenticated
 {
     public function newAction()
-    {
-        $date = new UserIncome();
-        $date->dateSetting();
-
+    {   
         View::renderTemplate('Income/new.html', [
             'category' => UserIncome::incomeCategory(),
-            'income' => $date
+            'date_of_income' => UserIncome::currentDate()
         ]);
     }
 
     public function addAction()
     {
-
-        $income = new UserIncome($_POST);
-
-        if ($income->saveIncome()) {
+        if (UserIncome::saveIncome()) {
             Flash::addMessage('Income added');
             View::renderTemplate('Home/index.html');
         } else {
-
             View::renderTemplate('Income/new.html', [
+                'errors' => UserIncome::validate(),
                 'category' => UserIncome::incomeCategory(),
-                'income' => $income
             ]);
         }
     }

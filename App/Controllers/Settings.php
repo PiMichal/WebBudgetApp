@@ -54,16 +54,15 @@ class Settings extends Authenticated
     public function incomeSaveAction()
     {
         $new_category = ucfirst(strtolower($_POST["new_category"]));
-        $income = new UserIncome();
 
-        if ($income->categoryValidate($new_category)) {
-            $income->incomeAddCategory($new_category);
+        if (empty(UserIncome::categoryValidate($new_category))) {
+            UserIncome::incomeAddCategory($new_category);
             Flash::addMessage('Category added');
             View::renderTemplate('Settings/settings.html', []);
         } else {
             Flash::addMessage('Category not added', Flash::WARNING);
             View::renderTemplate('Settings/incomeAdd.html', [
-                'user' => $income,
+                'errors' => UserIncome::categoryValidate($new_category),
                 'category' => $_POST["new_category"]
             ]);
         }
@@ -79,16 +78,15 @@ class Settings extends Authenticated
     public function incomeRenameSaveAction()
     {
         $new_category = ucfirst(strtolower($_POST["new_category"]));
-        $income = new UserIncome();
 
-        if ($income->categoryValidate($new_category)) {
-            $income->incomeRename($new_category);
+        if (empty(UserIncome::categoryValidate($new_category))) {
+            UserIncome::incomeRename($new_category);
             Flash::addMessage('Category renamed');
             View::renderTemplate('Settings/settings.html', []);
         } else {
             Flash::addMessage('The name of the category has not been changed', Flash::WARNING);
             View::renderTemplate('Settings/renameIncome.html', [
-                'user' => $income,
+                'errors' => UserIncome::categoryValidate($new_category),
                 'selected_category' => $_POST["income_name"],
                 'new_category' => $_POST["new_category"],
                 'category' => UserIncome::incomeCategory()
@@ -112,7 +110,6 @@ class Settings extends Authenticated
 
     public function removeIncomeCategoryAction()
     {
-
         if (count(UserIncome::incomeCategory()) > 1) {
             UserIncome::categoryDelete();
             Flash::addMessage('Category deleted');
@@ -136,16 +133,14 @@ class Settings extends Authenticated
     {
         $new_category = ucfirst(strtolower($_POST["new_category"]));
 
-        $expense = new UserExpense();
-
-        if ($expense->categoryValidate($new_category)) {
-            $expense->expenseAddCategory($new_category);
+        if (empty(UserExpense::categoryValidate($new_category))) {
+            UserExpense::expenseAddCategory($new_category);
             Flash::addMessage('Category added');
             View::renderTemplate('Settings/settings.html', []);
         } else {
             Flash::addMessage('Category not added', Flash::WARNING);
             View::renderTemplate('Settings/expenseAdd.html', [
-                'user' => $expense,
+                'errors' => UserExpense::categoryValidate($new_category),
                 'category' => $_POST["new_category"]
             ]);
         }
@@ -161,16 +156,15 @@ class Settings extends Authenticated
     public function expenseRenameSaveAction()
     {
         $new_category = ucfirst(strtolower($_POST["new_category"]));
-        $expense = new UserExpense();
 
-        if ($expense->categoryValidate($new_category)) {
-            $expense->expenseRename($new_category);
+        if (empty(UserExpense::categoryValidate($new_category))) {
+            UserExpense::expenseRename($new_category);
             Flash::addMessage('Category renamed');
             View::renderTemplate('Settings/settings.html', []);
         } else {
             Flash::addMessage('The name of the category has not been changed', Flash::WARNING);
             View::renderTemplate('Settings/renameExpense.html', [
-                'user' => $expense,
+                'errors' => UserExpense::categoryValidate($new_category),
                 'selected_category' => $_POST["expense_name"],
                 'new_category' => $_POST["new_category"],
                 'category' => UserExpense::expenseCategory()
@@ -218,16 +212,14 @@ class Settings extends Authenticated
     {
         $new_payment_method = ucfirst(strtolower($_POST["new_payment_method"]));
 
-        $expense = new UserExpense();
-
-        if ($expense->categoryValidate($new_payment_method)) {
-            $expense->addAPaymentMethod($new_payment_method);
+        if (empty(UserExpense::categoryValidate($new_payment_method))) {
+            UserExpense::addAPaymentMethod($new_payment_method);
             Flash::addMessage('Payment method added');
             View::renderTemplate('Settings/settings.html', []);
         } else {
             Flash::addMessage('Payment method not added', Flash::WARNING);
             View::renderTemplate('Settings/paymentMethodAdd.html', [
-                'user' => $expense,
+                'errors' => UserExpense::categoryValidate($new_payment_method),
                 'category' => $_POST["new_payment_method"]
             ]);
         }
@@ -243,16 +235,15 @@ class Settings extends Authenticated
     public function paymentMethodRenameSaveAction()
     {
         $new_payment_method = ucfirst(strtolower($_POST["new_payment_method"]));
-        $expense = new UserExpense();
 
-        if ($expense->categoryValidate($new_payment_method)) {
-            $expense->paymentMethodRename($new_payment_method);
+        if (empty(UserExpense::categoryValidate($new_payment_method))) {
+            UserExpense::paymentMethodRename($new_payment_method);
             Flash::addMessage('Payment method renamed');
             View::renderTemplate('Settings/settings.html', []);
         } else {
             Flash::addMessage('The name of the payment method has not been changed', Flash::WARNING);
             View::renderTemplate('Settings/paymentMethodRename.html', [
-                'user' => $expense,
+                'errors' => UserExpense::categoryValidate($new_payment_method),
                 'selected_payment_methods' => $_POST["payment_methods"],
                 'new_payment_method' => $_POST["new_payment_method"],
                 'payment_methods' => UserExpense::paymentMethods()
@@ -276,7 +267,6 @@ class Settings extends Authenticated
 
     public function removePaymentMethodAction()
     {
-
         if (count(UserExpense::paymentMethods()) > 1) {
             UserExpense::paymentMethodDelete();
             Flash::addMessage('Payment method deleted');
@@ -293,7 +283,6 @@ class Settings extends Authenticated
 
     public function deleteAccountInfoAction()
     {
-
         View::renderTemplate('Settings/deleteAccount.html');
     }
 

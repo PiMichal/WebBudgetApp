@@ -87,10 +87,10 @@
 		<main class="container py-5">
 			<form class="text-white" method="post">
 				<h3>Settings</h3>
-                {% if user.errors is not empty %}
+                {% if errors is not empty %}
 				<h5 class="text-start">Errors:</h5>
 				<ul class="text-start">
-					{% for error in user.errors %}
+					{% for error in errors %}
 						<li>{{ error }}</li>
 					{% endfor %}
 				</ul>

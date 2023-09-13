@@ -7,39 +7,21 @@ use PDO;
 
 class UserExpense extends \Core\Model
 {
-   public $user_id;
-   public $amount;
-   public $date_of_expense;
-   public $expense_category_assigned_to_user_id;
-   public $payment_method_assigned_to_user_id;
-   public $expense_comment;
-
-   public $start_date;
-   public $end_date;
-
-   public $errors = [];
-
-
-   public function __construct($data = [])
+   public static function validate()
    {
-      foreach ($data as $key => $value) {
-         $this->$key = $value;
-      };
-   }
+      $errors = [];
 
-   public function validate()
-   {
-
-      if ($this->amount == '') {
-         $this->errors[] = 'Amount is required';
+      if ($_POST["amount"] == '') {
+         $errors = ["Amount is required"];
       }
 
-      if ($this->date_of_expense == '') {
-         $this->errors[] = 'Date is required';
+      if ($_POST["date_of_expense"] == '') {
+         array_push($errors, "Date is required");
       }
+      return $errors;
    }
 
-   public function findByCategory($category)
+   public static function findByCategory($category)
    {
       $user = Auth::getUser();
 
@@ -64,7 +46,7 @@ class UserExpense extends \Core\Model
       }
    }
 
-   public function findByPaymentMethod($payment_method)
+   public static function findByPaymentMethod($payment_method)
    {
       $user = Auth::getUser();
 
@@ -89,36 +71,31 @@ class UserExpense extends \Core\Model
       }
    }
 
-   public function categoryValidate($category)
+   public static function categoryValidate($category)
    {
-      // category
+      $errors = [];
 
       if (static::findByCategory($category)) {
-         $this->errors[] = 'Category already exists';
-         return false;
+         $errors = ['Category already exists'];
       }
 
       if (static::findByPaymentMethod($category)) {
-         $this->errors[] = 'Payment method already exists';
-         return false;
+         array_push($errors, "Payment method already exists");
       }
 
       if ($category == '') {
-         $this->errors[] = 'Category is required';
-         return false;
+         array_push($errors, "Category is required");
       }
 
       if (!ctype_alpha(str_replace(' ', '', $category))) {
-         $this->errors[] = "The string $category does not consist of all letters";
-         return false;
+         array_push($errors, "The string $category does not consist of all letters");
       }
 
       if (strlen($category) > 50) {
-         $this->errors[] = 'Too many characters - maximum 50 characters';
-         return false;
+         array_push($errors, "Too many characters - maximum 50 characters");
       }
 
-      return true;
+      return $errors;
    }
 
    public static function createDefault($email)
@@ -155,10 +132,9 @@ class UserExpense extends \Core\Model
       $stmt->execute();
    }
 
-   public function saveExpense()
+   public static function saveExpense()
    {
-      $this->validate();
-      if (empty($this->errors)) {
+      if (empty(static::validate())) {
 
          $user = Auth::getUser();
 
@@ -174,20 +150,20 @@ class UserExpense extends \Core\Model
          $stmt = $db->prepare($sql);
 
          $stmt->bindValue('user_id', $user->id, PDO::PARAM_INT);
-         $stmt->bindValue('expense_category_assigned_to_user_id', $this->expense_category_assigned_to_user_id, PDO::PARAM_STR);
-         $stmt->bindValue('payment_method_assigned_to_user_id', $this->payment_method_assigned_to_user_id, PDO::PARAM_STR);
-         $stmt->bindValue('amount', $this->amount, PDO::PARAM_STR);
-         $stmt->bindValue('date_of_expense', $this->date_of_expense, PDO::PARAM_STR);
-         $stmt->bindValue('expense_comment', $this->expense_comment, PDO::PARAM_STR);
+         $stmt->bindValue('expense_category_assigned_to_user_id', $_POST["expense_category_assigned_to_user_id"], PDO::PARAM_STR);
+         $stmt->bindValue('payment_method_assigned_to_user_id', $_POST["payment_method_assigned_to_user_id"], PDO::PARAM_STR);
+         $stmt->bindValue('amount', $_POST["amount"], PDO::PARAM_STR);
+         $stmt->bindValue('date_of_expense', $_POST["date_of_expense"], PDO::PARAM_STR);
+         $stmt->bindValue('expense_comment', $_POST["expense_comment"], PDO::PARAM_STR);
 
          return $stmt->execute();
       }
       return false;
    }
 
-   public function getExpense()
+   public static function getExpense()
    {
-      $this->dateSetting();
+      $date = static::dateSetting();
 
       $user = Auth::getUser();
 
@@ -203,17 +179,17 @@ class UserExpense extends \Core\Model
       $stmt = $db->prepare($sql);
 
       $stmt->bindValue(':userId', $user->id, PDO::PARAM_INT);
-      $stmt->bindValue(':startDate', $this->start_date, PDO::PARAM_STR);
-      $stmt->bindValue(':endDate', $this->end_date, PDO::PARAM_STR);
+      $stmt->bindValue(':startDate', $date["start_date"], PDO::PARAM_STR);
+      $stmt->bindValue(':endDate', $date["end_date"], PDO::PARAM_STR);
 
       $stmt->execute();
 
       return $stmt->fetchAll();
    }
 
-   public function getAllExpense()
+   public static function getAllExpense()
    {
-      $this->dateSetting();
+      $date = static::dateSetting();
 
       $user = Auth::getUser();
 
@@ -229,17 +205,18 @@ class UserExpense extends \Core\Model
       $stmt = $db->prepare($sql);
 
       $stmt->bindValue(':userId', $user->id, PDO::PARAM_INT);
-      $stmt->bindValue(':startDate', $this->start_date, PDO::PARAM_STR);
-      $stmt->bindValue(':endDate', $this->end_date, PDO::PARAM_STR);
+      $stmt->bindValue(':startDate', $date["start_date"], PDO::PARAM_STR);
+      $stmt->bindValue(':endDate', $date["end_date"], PDO::PARAM_STR);
 
       $stmt->execute();
 
       return $stmt->fetchAll();
    }
 
-   public function countTotalExpense()
+   public static function countTotalExpense()
    {
-      $this->dateSetting();
+      $date = static::dateSetting();
+
       $user = Auth::getUser();
 
       $sql = "SELECT SUM(amount) AS expense_sum
@@ -252,8 +229,8 @@ class UserExpense extends \Core\Model
       $stmt = $db->prepare($sql);
 
       $stmt->bindValue(':userId', $user->id, PDO::PARAM_INT);
-      $stmt->bindValue(':startDate', $this->start_date, PDO::PARAM_STR);
-      $stmt->bindValue(':endDate', $this->end_date, PDO::PARAM_STR);
+      $stmt->bindValue(':startDate', $date["start_date"], PDO::PARAM_STR);
+      $stmt->bindValue(':endDate', $date["end_date"], PDO::PARAM_STR);
 
       $stmt->execute();
 
@@ -343,7 +320,6 @@ class UserExpense extends \Core\Model
 
    public static function categoryDelete()
    {
-
       $user = Auth::getUser();
 
       $sql = "DELETE FROM expenses_category_assigned_to_users
@@ -429,8 +405,6 @@ class UserExpense extends \Core\Model
 
    public static function paymentMethodDelete()
    {
-      static::updateRemovedPaymentMethod();
-
       $user = Auth::getUser();
 
       $sql = "DELETE FROM payment_methods_assigned_to_users
@@ -443,26 +417,6 @@ class UserExpense extends \Core\Model
 
       $stmt->bindValue(':user_id', $user->id, PDO::PARAM_INT);
       $stmt->bindValue(':payment_method', $_POST["payment_methods"], PDO::PARAM_STR);
-
-      $stmt->execute();
-   }
-
-   public static function updateRemovedPaymentMethod()
-   {
-      $user = Auth::getUser();
-
-      $sql = "UPDATE expenses
-              SET payment_method_assigned_to_user_id = (SELECT id FROM payment_methods_assigned_to_users WHERE user_id = :user_id 
-              AND name != :removed_payment_method LIMIT 1)
-              WHERE user_id = :user_id
-              AND payment_method_assigned_to_user_id = (SELECT id FROM payment_methods_assigned_to_users WHERE user_id = :user_id 
-              AND name = :removed_payment_method)";
-
-      $db = static::getDB();
-      $stmt = $db->prepare($sql);
-
-      $stmt->bindValue(':user_id', $user->id, PDO::PARAM_INT);
-      $stmt->bindValue(':removed_payment_method', $_POST["payment_methods"], PDO::PARAM_STR);
 
       $stmt->execute();
    }
@@ -483,17 +437,24 @@ class UserExpense extends \Core\Model
       $stmt->execute();
    }
 
-   public function dateSetting()
+   public static function dateSetting()
    {
 
       if (isset($_POST["start_date"]) && isset($_POST["end_date"])) {
-         $this->start_date = $_POST['start_date'];
-         $this->end_date = $_POST['end_date'];
+         return array(
+            'start_date' => $_POST['start_date'],
+            'end_date' => $_POST['end_date']
+         );
       } else {
-         $this->start_date = date('Y-m-01');
-         $this->end_date = date('Y-m-t');
+         return array(
+            'start_date' => date('Y-m-01'),
+            'end_date' => date('Y-m-t')
+         );
       }
+   }
 
-      $this->date_of_expense = date('Y-m-d');
+   public static function currentDate()
+   {
+      return (date('Y-m-d'));
    }
 }

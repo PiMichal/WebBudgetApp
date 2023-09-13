@@ -10,29 +10,24 @@ class Expense extends Authenticated
 {
     public function newAction()
     {
-        $date = new UserExpense();
-        $date->dateSetting();
 
         View::renderTemplate('Expense/new.html', [
             'category' => UserExpense::expenseCategory(),
             'payment_methods' => UserExpense::paymentMethods(),
-            'expense' => $date
+            'date_of_expense' => UserExpense::currentDate()
         ]);
     }
 
     public function addAction()
     {
-        $expense = new UserExpense($_POST);
-
-        if ($expense->saveExpense()) {
+        if (UserExpense::saveExpense()) {
             Flash::addMessage('Expense added');
             View::renderTemplate('Home/index.html');
         } else {
-
             View::renderTemplate('Expense/new.html', [
+                'errors' => UserExpense::validate(),
                 'category' => UserExpense::expenseCategory(),
                 'payment_methods' => UserExpense::paymentMethods(),
-                'expense' => $expense
             ]);
         }
     }
