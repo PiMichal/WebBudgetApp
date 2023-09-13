@@ -8,105 +8,26 @@ use \App\Token;
 use Core\View;
 use App\Auth;
 
-/**
- * User model
- *
- * PHP version 7.0
- */
 class User extends \Core\Model
 {
-    /**
-     * User ID
-     * @var integer
-     */
-
     public $id;
-
-    /**
-     * User Login
-     * @var string
-     */
     public $username;
-
-    /**
-     * User Email
-     * @var string
-     */
     public $email;
-
-    /**
-     * User password
-     * @var string
-     */
     public $password;
-
-    /**
-     * User password confirmation
-     * @var string
-     */
     public $password_confirmation;
 
-    /**
-     * Token
-     * @var string
-     */
     public $remember_token;
 
-    /**
-     * reset hash
-     * @var string
-     */
     public $password_reset_hash;
-
-    /**
-     * reset expires hash
-     * @var string
-     */
     public $password_reset_expires_at;
-
-    /**
-     * reset token
-     * @var string
-     */
     public $password_reset_token;
-
-    /**
-     * Token expiry
-     * @var string
-     */
-
     public $expiry_timestamp;
 
-    /**
-     * Activation hash
-     * @var string
-     */
+    public $activation_hash;
+    public $is_active;
 
-     public $activation_hash;
-
-    /**
-     * Returns true if the account is activated, otherwise false.
-     * @var boolean
-     */
-
-     public $is_active;
-
-
-
-    /**
-     * Error messages
-     * 
-     * @var array
-     */
     public $errors = [];
 
-    /**
-     * Class constructor
-     * 
-     * @param array $data Initial property values
-     * 
-     * @return void
-     */
     public function __construct($data = [])
     {
         foreach ($data as $key => $value) {
@@ -114,11 +35,6 @@ class User extends \Core\Model
         };
     }
 
-    /**
-     * Adding a new user to the database
-     *
-     * @return void
-     */
     public function save()
     {
 
@@ -148,11 +64,6 @@ class User extends \Core\Model
         return false;
     }
 
-    /**
-     * Validate current property values, adding valitation error messages to the errors array property
-     * 
-     * @return void
-     */
     public function validate()
     {
         if ($this->username == '') {
@@ -168,11 +79,6 @@ class User extends \Core\Model
         }
     }
 
-    /**
-     * Validate current property values, adding valitation error messages to the errors array property
-     * 
-     * @return void
-     */
     public function validatePassword()
     {
         // Password
@@ -193,14 +99,6 @@ class User extends \Core\Model
         }
     }
 
-    /**
-     * See if a user record already exists with the specified email
-     * 
-     * @param string $email email address to search for
-     * @param string $ignore_id Return false anyway if the record found has this ID
-     * 
-     * @return boolean True if a record already exists with specified email, false otherwise
-     */
     public static function emailExists($email, $ignore_id = null)
     {
         $user = static::findByEmail($email);
@@ -214,13 +112,6 @@ class User extends \Core\Model
         return false;
     }
 
-    /**
-     * Find a user model by email address
-     * 
-     * @param string $email email address to search for
-     * 
-     * @return mixed User object if found, flase otherwise
-     */
     public static function findByEmail($email)
     {
 
@@ -237,14 +128,6 @@ class User extends \Core\Model
         return $stmt->fetch();
     }
 
-    /**
-     * Authenticate a user by email and password.
-     * 
-     * @param string $email email address
-     * @param string $password password
-     * 
-     * @return mixed The user object or false if authentication fails
-     */
     public static function authenticate($email, $password)
     {
         $user = static::findByEmail($email);
@@ -258,13 +141,6 @@ class User extends \Core\Model
         return false;
     }
 
-    /**
-     * Find a user model by ID
-     * 
-     * @param string $id The user ID
-     * 
-     * @return mixed User object if found, flase otherwise
-     */
     public static function findByID($id)
     {
         $sql = 'SELECT * FROM users WHERE id = :id';
@@ -280,19 +156,13 @@ class User extends \Core\Model
         return $stmt->fetch();
     }
 
-    /**
-     * Remember the login by inserting a new unique token into the remembered_logins table
-     * for this user record
-     * 
-     * @return boolean True if the login was rememberd successfully, false otherwise
-     */
     public function rememberLogin()
     {
         $token = new Token();
         $hashed_token = $token->getHash();
         $this->remember_token = $token->getValue();
 
-        $this->expiry_timestamp = time() + 60 * 60 * 24 * 30; // 30 days from now
+        $this->expiry_timestamp = time() + 60 * 60 * 24 * 30;
 
         $sql = 'INSERT INTO remembered_logins (token_hash, user_id, expires_at)
         VALUES (:token_hash, :user_id, :expires_at)';
@@ -307,13 +177,6 @@ class User extends \Core\Model
         return $stmt->execute();
     }
 
-    /**
-     * Send password reset instructions to the user specified
-     * 
-     * @param string $email The email address
-     * 
-     * @return void
-     */
     public static function sendPasswordReset($email)
     {
 
@@ -329,11 +192,6 @@ class User extends \Core\Model
         }
     }
 
-    /**
-     * Start the password reset process by generating a new token and expiry
-     * 
-     * @return void
-     */
     protected function startPasswordReset()
     {
         $token = new Token();
@@ -341,7 +199,7 @@ class User extends \Core\Model
 
         $this->password_reset_token = $token->getValue();
 
-        $expiry_timestamp = time() + 60 * 60 * 2;  // 2 hours from now
+        $expiry_timestamp = time() + 60 * 60 * 2;
 
         $sql = 'UPDATE users
                 SET password_reset_hash = :token_hash,
@@ -358,11 +216,6 @@ class User extends \Core\Model
         return $stmt->execute();
     }
 
-    /**
-     * Send password reset insturctions in an email to the user
-     * 
-     * @return void
-     */
     protected function sendPasswordResetEmail()
     {
         $url = 'http://' . $_SERVER['HTTP_HOST'] . '/password/reset/' . $this->password_reset_token;
@@ -372,13 +225,6 @@ class User extends \Core\Model
         Mail::send($this->email, 'Password reset', $text);
     }
 
-    /**
-     * Find a user model by password reset token and expiry
-     * 
-     * @param string $token Password reset token sent to user
-     * 
-     * @return mixed User object if found and the token hasn't expired, null otherwise
-     */
     public static function findByPasswordReset($token)
     {
         $token = new Token($token);
@@ -400,7 +246,6 @@ class User extends \Core\Model
 
         if ($user) {
 
-            // Check password reset token hasn't expired
             if (strtotime($user->password_reset_expires_at) > time()) {
 
                 return $user;
@@ -408,14 +253,6 @@ class User extends \Core\Model
         }
     }
 
-    /**
-     * Reset the password
-     * 
-     * @param string $password The new password
-     * @param string $password_confirmation The new password confirmation
-     * 
-     * @return boolean True if the password was updated successfully, false otherwise
-     */
     public function resetPassword($password, $password_confirmation)
     {
 
@@ -450,11 +287,6 @@ class User extends \Core\Model
         return false;
     }
 
-    /**
-     * Send an email to the user containing the activation link
-     * 
-     * @return void
-     */
     public function sendActivationEmail()
     {
         $url = 'http://' . $_SERVER['HTTP_HOST'] . '/signup/activate/' . $this->activation_hash;
@@ -464,13 +296,6 @@ class User extends \Core\Model
         Mail::send($this->email, 'Account activation', $text);
     }
 
-    /**
-     * Activate the user account with the specified activation token
-     * 
-     * @param string $value Activation token from the URL
-     * 
-     * @return void
-     */
     public static function activate($value)
     {
         $token = new Token($value);
@@ -489,11 +314,6 @@ class User extends \Core\Model
         $stmt->execute();
     }
 
-    /**
-     * Update your account details
-     *
-     * @return void
-     */
     public function update()
     {
         $this->id = $_SESSION['user_id'];
@@ -518,11 +338,6 @@ class User extends \Core\Model
         return false;
     }
 
-    /**
-     * Password update
-     *
-     * @return void
-     */
     public function updatePassword()
     {
         $this->id = $_SESSION['user_id'];
@@ -553,11 +368,6 @@ class User extends \Core\Model
         return false;
     }
 
-    /**
-     * Deleting a user account
-     *
-     * @return void
-     */
     public static function deleteAccount()
     {
         $user = Auth::getUser();

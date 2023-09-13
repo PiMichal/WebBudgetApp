@@ -5,38 +5,11 @@ namespace App\Models;
 use PDO;
 use \App\Token;
 
-/**
- * Remembered login model
- * 
- * PHP version 7.0
- */
 class RememberedLogin extends \Core\Model
 {
-    /**
-     * User ID
-     * @var int
-     */
     public $user_id;
- 
-    /**
-     * Token hash
-     * @var string
-     */
     public $token_hash;
- 
-    /**
-     * Token expiry
-     * @var string
-     */
     public $expires_at;
- 
-    /**
-     * Find a remembered login model by the token
-     * 
-     * @param string $token The remebered login token
-     * 
-     * @return mixed Remembered login object if found, false otherwise
-     */
 
     public static function findByToken($token)
     {
@@ -58,31 +31,16 @@ class RememberedLogin extends \Core\Model
         return $stmt->fetch();
     }
 
-    /**
-     * Get the user model associated with this remembered login
-     * 
-     * @return User the user model
-     */
     public function getUser()
     {
         return User::findByID($this->user_id);
     }
 
-    /**
-     * See if the remember token has expired or not, based on the current system time
-     * 
-     * @return boolean True if the token has expires, false otherwise
-     */
     public function hasExpired()
     {
         return strtotime($this->expires_at) < time();
     }
 
-    /**
-     * Delete this model
-     * 
-     * @return void
-     */
     public function delete()
     {
         $sql = 'DELETE FROM remembered_logins

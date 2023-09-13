@@ -5,71 +5,21 @@ namespace App\Models;
 use App\Auth;
 use PDO;
 
-/**
- * Income model
- *
- * PHP version 7.0
- */
-
 class UserExpense extends \Core\Model
 {
    public $user_id;
-   /**
-    * Amount of expense
-    * @var int
-    */
    public $amount;
-
-   /**
-    * Date of expense
-    * @var int
-    */
    public $date_of_expense;
-
-   /**
-    * Expense category
-    * @var int
-    */
    public $expense_category_assigned_to_user_id;
-
-   /**
-    * Expense payment method
-    * @var int
-    */
    public $payment_method_assigned_to_user_id;
-
-   /**
-    * Expense commentary (optional)
-    * @var string
-    */
    public $expense_comment;
 
-   /**
-    * Start date
-    * @var string
-    */
-    public $start_date;
+   public $start_date;
+   public $end_date;
 
-    /**
-     * End date
-     * @var string
-     */
-    public $end_date;
-
-   /**
-    * Error messages
-    * 
-    * @var array
-    */
    public $errors = [];
 
-   /**
-    * Class constructor
-    * 
-    * @param array $data Initial property values
-    * 
-    * @return void
-    */
+
    public function __construct($data = [])
    {
       foreach ($data as $key => $value) {
@@ -77,14 +27,9 @@ class UserExpense extends \Core\Model
       };
    }
 
-   /**
-    * Validate current property values, adding valitation error messages to the errors array property
-    * 
-    * @return void
-    */
    public function validate()
    {
-      // username
+
       if ($this->amount == '') {
          $this->errors[] = 'Amount is required';
       }
@@ -94,11 +39,6 @@ class UserExpense extends \Core\Model
       }
    }
 
-   /**
-    * See if a user record already exists with the specified category
-    * 
-    * @return boolean True if a record already exists with specified category, false otherwise
-    */
    public function findByCategory($category)
    {
       $user = Auth::getUser();
@@ -124,11 +64,6 @@ class UserExpense extends \Core\Model
       }
    }
 
-   /**
-    * See if a user record already exists with the specified payment method
-    * 
-    * @return boolean True if a record already exists with specified payment method, false otherwise
-    */
    public function findByPaymentMethod($payment_method)
    {
       $user = Auth::getUser();
@@ -154,11 +89,6 @@ class UserExpense extends \Core\Model
       }
    }
 
-   /**
-    * Validate current property values, adding valitation error messages to the errors array property
-    * 
-    * @return void
-    */
    public function categoryValidate($category)
    {
       // category
@@ -191,12 +121,6 @@ class UserExpense extends \Core\Model
       return true;
    }
 
-   /**
-    * Copy default categories during registration
-    * 
-    * @return void
-    */
-
    public static function createDefault($email)
    {
       $user = User::findByEmail($email);
@@ -215,12 +139,6 @@ class UserExpense extends \Core\Model
       static::createDefaultPaymentMethod($email);
    }
 
-   /**
-    * Copy default payment method during registration
-    * 
-    * @return void
-    */
-
    private static function createDefaultPaymentMethod($email)
    {
       $user = User::findByEmail($email);
@@ -237,11 +155,6 @@ class UserExpense extends \Core\Model
       $stmt->execute();
    }
 
-   /**
-    * Saving the entered expenses in the database
-    *
-    * @return void
-    */
    public function saveExpense()
    {
       $this->validate();
@@ -272,11 +185,6 @@ class UserExpense extends \Core\Model
       return false;
    }
 
-   /**
-    * Display of user expenses over a specified period
-    * 
-    * @return array
-    */
    public function getExpense()
    {
       $this->dateSetting();
@@ -303,11 +211,6 @@ class UserExpense extends \Core\Model
       return $stmt->fetchAll();
    }
 
-   /**
-    * View detailed user expenses over a specified period
-    * 
-    * @return array
-    */
    public function getAllExpense()
    {
       $this->dateSetting();
@@ -334,11 +237,6 @@ class UserExpense extends \Core\Model
       return $stmt->fetchAll();
    }
 
-   /**
-    * Calculation of the sum of the user's expenses in a given period
-    * 
-    * @return string
-    */
    public function countTotalExpense()
    {
       $this->dateSetting();
@@ -362,11 +260,6 @@ class UserExpense extends \Core\Model
       return $stmt->fetchColumn();
    }
 
-   /**
-    * Expense update
-    * 
-    * @return void
-    */
    public static function expenseUpdate()
    {
       $user = Auth::getUser();
@@ -392,11 +285,6 @@ class UserExpense extends \Core\Model
       $stmt->execute();
    }
 
-   /**
-    * Display of expense categories
-    * 
-    * @return array
-    */
    public static function expenseCategory()
    {
       $user = Auth::getUser();
@@ -416,11 +304,6 @@ class UserExpense extends \Core\Model
       return $stmt->fetchAll(PDO::FETCH_ASSOC);
    }
 
-   /**
-    * Save a new category of expense
-    * 
-    * @return void
-    */
    public static function expenseAddCategory($category)
    {
       $user = Auth::getUser();
@@ -437,11 +320,6 @@ class UserExpense extends \Core\Model
       $stmt->execute();
    }
 
-   /**
-    * Save the new expense category name
-    *
-    * @return void
-    */
    public static function expenseRename($new_category)
    {
 
@@ -463,14 +341,8 @@ class UserExpense extends \Core\Model
       $stmt->execute();
    }
 
-   /**
-    * Deleting the selected expense category
-    *
-    * @return void
-    */
    public static function categoryDelete()
    {
-      static::updateTheDeletedCategory();
 
       $user = Auth::getUser();
 
@@ -488,36 +360,6 @@ class UserExpense extends \Core\Model
       $stmt->execute();
    }
 
-   /**
-    * Change a deleted category to an existing one
-    *
-    * @return void
-    */
-   public static function updateTheDeletedCategory()
-   {
-      $user = Auth::getUser();
-
-      $sql = "UPDATE expenses
-              SET expense_category_assigned_to_user_id = (SELECT id FROM expenses_category_assigned_to_users WHERE user_id = :user_id 
-              AND name != :removed_category LIMIT 1)
-              WHERE user_id = :user_id
-              AND expense_category_assigned_to_user_id = (SELECT id FROM expenses_category_assigned_to_users WHERE user_id = :user_id 
-              AND name = :removed_category)";
-
-      $db = static::getDB();
-      $stmt = $db->prepare($sql);
-
-      $stmt->bindValue(':user_id', $user->id, PDO::PARAM_INT);
-      $stmt->bindValue(':removed_category', $_POST["expense_name"], PDO::PARAM_STR);
-
-      $stmt->execute();
-   }
-
-   /**
-    * Remove of expenses
-    *
-    * @return void
-    */
    public static function expenseDelete()
    {
       $sql = "DELETE FROM expenses
@@ -531,11 +373,6 @@ class UserExpense extends \Core\Model
       $stmt->execute();
    }
 
-   /**
-    * Remove payment method
-    *
-    * @return void
-    */
    public static function paymentMethods()
    {
       $user = Auth::getUser();
@@ -554,11 +391,6 @@ class UserExpense extends \Core\Model
       return $stmt->fetchAll(PDO::FETCH_ASSOC);
    }
 
-   /**
-    * Save new payment method
-    *
-    * @return void
-    */
    public static function addAPaymentMethod($category)
    {
       $user = Auth::getUser();
@@ -575,11 +407,6 @@ class UserExpense extends \Core\Model
       $stmt->execute();
    }
 
-   /**
-    * Save the name of the new payment method
-    *
-    * @return void
-    */
    public static function paymentMethodRename($new_payment_method)
    {
       $user = Auth::getUser();
@@ -600,11 +427,6 @@ class UserExpense extends \Core\Model
       $stmt->execute();
    }
 
-   /**
-    * Deleting the selected payment method
-    *
-    * @return void
-    */
    public static function paymentMethodDelete()
    {
       static::updateRemovedPaymentMethod();
@@ -625,11 +447,6 @@ class UserExpense extends \Core\Model
       $stmt->execute();
    }
 
-   /**
-    * Change a deleted payment method to an existing one
-    *
-    * @return void
-    */
    public static function updateRemovedPaymentMethod()
    {
       $user = Auth::getUser();
@@ -650,11 +467,6 @@ class UserExpense extends \Core\Model
       $stmt->execute();
    }
 
-   /**
-    * Delete expenses, categories and payment methods for the selected user
-    *
-    * @return void
-    */
    public static function deleteAccount()
    {
       $user = Auth::getUser();
@@ -671,22 +483,17 @@ class UserExpense extends \Core\Model
       $stmt->execute();
    }
 
-   /**
-     * Setting the right date
-     * 
-     * @return void
-     */
-    public function dateSetting()
-    {
+   public function dateSetting()
+   {
 
-        if (isset($_POST["start_date"]) && isset($_POST["end_date"])) {
-            $this->start_date = $_POST['start_date'];
-            $this->end_date = $_POST['end_date'];
-        } else {
-            $this->start_date = date('Y-m-01');
-            $this->end_date = date('Y-m-t');
-        }
-        
-        $this->date_of_expense = date('Y-m-d');
-    }
+      if (isset($_POST["start_date"]) && isset($_POST["end_date"])) {
+         $this->start_date = $_POST['start_date'];
+         $this->end_date = $_POST['end_date'];
+      } else {
+         $this->start_date = date('Y-m-01');
+         $this->end_date = date('Y-m-t');
+      }
+
+      $this->date_of_expense = date('Y-m-d');
+   }
 }

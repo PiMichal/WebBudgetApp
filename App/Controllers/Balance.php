@@ -2,25 +2,15 @@
 
 namespace App\Controllers;
 
-use App\Models\UserBalance;
 use Core\View;
 use App\Flash;
 use App\Models\UserExpense;
 use App\Models\UserIncome;
 
-/**
- * Balance controller
- * 
- * PHP version 7.0
- */
 
 class Balance extends Authenticated
 {
-    /**
-     * Show the balance page
-     * 
-     * @return void
-     */
+
     public function newAction()
     {
         $incomeData = new UserIncome();
@@ -45,11 +35,6 @@ class Balance extends Authenticated
         ]);
     }
 
-    /**
-     * Displaying data from a specific period
-     * 
-     * @return void
-     */
     public function dateAction()
     {
         $incomeData = new UserIncome();
@@ -81,11 +66,6 @@ class Balance extends Authenticated
         }
     }
 
-    /**
-     * Show detailed income data
-     * 
-     * @return void
-     */
     public function incomeDetailsAction()
     {
         $incomeData = new UserIncome();
@@ -101,11 +81,6 @@ class Balance extends Authenticated
         ]);
     }
 
-    /**
-     * Edit income details
-     * 
-     * @return void
-     */
     public function incomeEditAction()
     {
         $incomeData = new UserIncome();
@@ -125,11 +100,6 @@ class Balance extends Authenticated
         ]);
     }
 
-    /**
-     * Update the selected income item
-     * 
-     * @return void
-     */
     public function incomeUpdateAction()
     {
 
@@ -150,11 +120,6 @@ class Balance extends Authenticated
         ]);
     }
 
-    /**
-     * Delete the selected income item
-     * 
-     * @return void
-     */
     public function incomeDeleteAction()
     {
 
@@ -173,11 +138,6 @@ class Balance extends Authenticated
         ]);
     }
 
-    /**
-     * Show detailed expense data
-     * 
-     * @return void
-     */
     public function expenseDetailsAction()
     {
         $expenseData = new UserExpense();
@@ -193,11 +153,6 @@ class Balance extends Authenticated
         ]);
     }
 
-    /**
-     * Edit expense details
-     * 
-     * @return void
-     */
     public function expenseEditAction()
     {
         $expenseData = new UserExpense();
@@ -218,11 +173,6 @@ class Balance extends Authenticated
         ]);
     }
 
-    /**
-     * Update the selected expense item
-     * 
-     * @return void
-     */
     public function expenseUpdateAction()
     {
 
@@ -243,11 +193,6 @@ class Balance extends Authenticated
         ]);
     }
 
-    /**
-     * Delete the selected expense item
-     * 
-     * @return void
-     */
     public function expenseDeleteAction()
     {
 

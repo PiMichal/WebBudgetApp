@@ -88,15 +88,14 @@
 			<form class="text-white" method="post">
 				<h3>Settings</h3>
 				<hr>
-                <label for="inputCategory" class="form-label mb-3">Select the payment method to delete (at least one payment method must remain)</label>
-				<select class="form-select mb-5" id="inputCategory" name="payment_methods" required>
-					{% for payment_methods in payment_methods %}
-					<option >{{ payment_methods.payment_methods }}</option>
-					{% endfor %}
-				</select>
+                <br>
+                <div class="my-3">
+                    <h4 class="text-center">When the payment method <span class="text-warning fw-bold">"{{ payment_method }}"</span> is deleted, all payment methods assigned to it will be permanently lost</h4>
+				</div>
                 <div class="mb-3 text-center">
-					<button class="btn btn-danger col-md-4" type="submit" id="cancel" formaction="/settings/settings">Cancel</button>
-					<button class="btn btn-success col-md-4 mx-3" type="submit" formaction="/settings/removePaymentMethodInfo">Delete</button>
+					<button class="btn btn-success m-5" type="submit" id="cancel"
+						formaction="/settings/paymentMethodDelete">Don't delete the payment method</button>
+					<button class="btn btn-danger" type="submit" formaction="/settings/removePaymentMethod">Yes, remove the payment method</button>
 				</div>
 			</form>
 		</main>

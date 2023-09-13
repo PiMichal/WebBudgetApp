@@ -9,29 +9,13 @@ use App\Flash;
 use App\Models\UserExpense;
 use App\Models\UserIncome;
 
-/**
- * Setting controller
- *
- * PHP version 7.0
- */
 class Settings extends Authenticated
 {
-
-    /**
-     * Show the setting page
-     *
-     * @return void
-     */
     public function settingsAction()
     {
         View::renderTemplate('Settings/settings.html', []);
     }
 
-    /**
-     * View the edit page for user data
-     *
-     * @return void
-     */
     public function accountAction()
     {
         View::renderTemplate('Settings/editAccount.html', [
@@ -39,11 +23,6 @@ class Settings extends Authenticated
         ]);
     }
 
-    /**
-     * Update user account details
-     *
-     * @return void
-     */
     public function updateAction()
     {
         $user = new User($_POST);
@@ -67,21 +46,11 @@ class Settings extends Authenticated
         }
     }
 
-    /**
-     * View the add category page for income
-     *
-     * @return void
-     */
     public function incomeAddAction()
     {
         View::renderTemplate('Settings/incomeAdd.html', []);
     }
 
-    /**
-     * Save a new category of income
-     *
-     * @return void
-     */
     public function incomeSaveAction()
     {
         $new_category = ucfirst(strtolower($_POST["new_category"]));
@@ -100,11 +69,6 @@ class Settings extends Authenticated
         }
     }
 
-    /**
-     * View the income category renaming page
-     *
-     * @return void
-     */
     public function incomeRenameAction()
     {
         View::renderTemplate('Settings/renameIncome.html', [
@@ -112,11 +76,6 @@ class Settings extends Authenticated
         ]);
     }
 
-    /**
-     * Save the new income category name
-     *
-     * @return void
-     */
     public function incomeRenameSaveAction()
     {
         $new_category = ucfirst(strtolower($_POST["new_category"]));
@@ -137,11 +96,6 @@ class Settings extends Authenticated
         }
     }
 
-    /**
-     * View page to remove income categories
-     *
-     * @return void
-     */
     public function incomeDeleteAction()
     {
         View::renderTemplate('Settings/deleteIncome.html', [
@@ -149,11 +103,13 @@ class Settings extends Authenticated
         ]);
     }
 
-    /**
-     * Deleting the selected income category
-     *
-     * @return void
-     */
+    public function incomeDeleteInfoAction()
+    {
+        View::renderTemplate('Settings/deleteIncomeInfo.html', [
+            'category' => $_POST["income_name"]
+        ]);
+    }
+
     public function removeIncomeCategoryAction()
     {
 
@@ -171,21 +127,11 @@ class Settings extends Authenticated
         }
     }
 
-    /**
-     * View the add category page for expense
-     *
-     * @return void
-     */
     public function expenseAddAction()
     {
         View::renderTemplate('Settings/expenseAdd.html', []);
     }
 
-    /**
-     * Save a new category of expense
-     *
-     * @return void
-     */
     public function expenseSaveAction()
     {
         $new_category = ucfirst(strtolower($_POST["new_category"]));
@@ -205,11 +151,6 @@ class Settings extends Authenticated
         }
     }
 
-    /**
-     * View the expense category renaming page
-     *
-     * @return void
-     */
     public function expenseRenameAction()
     {
         View::renderTemplate('Settings/renameExpense.html', [
@@ -217,11 +158,6 @@ class Settings extends Authenticated
         ]);
     }
 
-    /**
-     * Save the new expense category name
-     *
-     * @return void
-     */
     public function expenseRenameSaveAction()
     {
         $new_category = ucfirst(strtolower($_POST["new_category"]));
@@ -242,11 +178,6 @@ class Settings extends Authenticated
         }
     }
 
-    /**
-     * View page to remove expense categories
-     *
-     * @return void
-     */
     public function expenseDeleteAction()
     {
         View::renderTemplate('Settings/deleteExpense.html', [
@@ -254,11 +185,13 @@ class Settings extends Authenticated
         ]);
     }
 
-    /**
-     * Deleting the selected expense category
-     *
-     * @return void
-     */
+    public function expenseDeleteInfoAction()
+    {
+        View::renderTemplate('Settings/deleteExpenseInfo.html', [
+            'category' => $_POST["expense_name"]
+        ]);
+    }
+
     public function removeExpenseCategoryAction()
     {
 
@@ -270,27 +203,17 @@ class Settings extends Authenticated
             ]);
         } else {
             Flash::addMessage('At least one category must remain!', Flash::INFO);
-            View::renderTemplate('Settings/deleteIncome.html', [
-                'category' => UserIncome::incomeCategory()
+            View::renderTemplate('Settings/deleteExpenses.html', [
+                'category' => UserExpense::expenseCategory()
             ]);
         }
     }
 
-    /**
-     * View the page for adding payment methods
-     *
-     * @return void
-     */
     public function paymentMethodEditAction()
     {
         View::renderTemplate('Settings/paymentMethodAdd.html', []);
     }
 
-    /**
-     * Save new payment method
-     *
-     * @return void
-     */
     public function paymentMethodSaveAction()
     {
         $new_payment_method = ucfirst(strtolower($_POST["new_payment_method"]));
@@ -310,11 +233,6 @@ class Settings extends Authenticated
         }
     }
 
-    /**
-     * View the payment method name change page
-     *
-     * @return void
-     */
     public function paymentMethodRenameAction()
     {
         View::renderTemplate('Settings/paymentMethodRename.html', [
@@ -322,11 +240,6 @@ class Settings extends Authenticated
         ]);
     }
 
-    /**
-     * Save the name of the new payment method
-     *
-     * @return void
-     */
     public function paymentMethodRenameSaveAction()
     {
         $new_payment_method = ucfirst(strtolower($_POST["new_payment_method"]));
@@ -347,11 +260,6 @@ class Settings extends Authenticated
         }
     }
 
-    /**
-     * View the page to remove the payment method
-     *
-     * @return void
-     */
     public function paymentMethodDeleteAction()
     {
         View::renderTemplate('Settings/deletePaymentMethod.html', [
@@ -359,11 +267,13 @@ class Settings extends Authenticated
         ]);
     }
 
-    /**
-     * Deleting the selected payment method
-     *
-     * @return void
-     */
+    public function removePaymentMethodInfoAction()
+    {
+        View::renderTemplate('Settings/paymentMethodDeleteInfo.html', [
+            'payment_method' => $_POST["payment_methods"]
+        ]);
+    }
+
     public function removePaymentMethodAction()
     {
 
@@ -381,22 +291,12 @@ class Settings extends Authenticated
         }
     }
 
-    /**
-     * View the page to delete the account
-     *
-     * @return void
-     */
     public function deleteAccountInfoAction()
     {
 
         View::renderTemplate('Settings/deleteAccount.html');
     }
 
-    /**
-     * Deleting a user account
-     *
-     * @return void
-     */
     public function deleteAccountAction()
     {
         UserExpense::deleteAccount();
