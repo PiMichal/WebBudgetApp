@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Home
+{% block title %}Settings
 {% endblock %}
 
 {% block body %}
@@ -88,13 +88,14 @@
 			<form class="text-white" method="post">
 				<h3>Settings</h3>
 				<hr>
-                <br>
-                <div class="my-3">
-                    <h4 class="text-center">When the payment method <span class="text-warning fw-bold">"{{ payment_method }}"</span> is deleted, all payment methods assigned to it will be permanently lost</h4>
+				<br>
+				<div class="my-3">
+					<h4 class="text-center">When the payment method
+						<span class="text-warning fw-bold">"{{ payment_method }}"</span>
+						is deleted, all payment methods assigned to it will be permanently lost</h4>
 				</div>
-                <div class="mb-3 text-center">
-					<button class="btn btn-success m-5" type="submit" id="cancel"
-						formaction="/settings/paymentMethodDelete">Don't delete the payment method</button>
+				<div class="mb-3 text-center">
+					<button class="btn btn-success m-5" type="submit" id="cancel" formaction="/settings/paymentMethodDelete">Don't delete the payment method</button>
 					<button class="btn btn-danger" type="submit" formaction="/settings/removePaymentMethod" name="payment_methods" value="{{ payment_method }}">Yes, remove the payment method</button>
 				</div>
 			</form>

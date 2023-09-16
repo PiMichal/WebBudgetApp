@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Auth;
 use Core\View;
 use App\Models\UserExpense;
 use App\Flash;
@@ -30,5 +31,21 @@ class Expense extends Authenticated
                 'payment_methods' => UserExpense::paymentMethods(),
             ]);
         }
+    }
+
+    public function limitAction()
+    {
+        $category = $this->route_params['category'];
+        $category = str_replace('_', ' ', $category);
+
+        echo json_encode(UserExpense::getLimit($category), JSON_UNESCAPED_UNICODE);
+    }
+
+    public function limitValueAction()
+    {
+        $category = $this->route_params['category'];
+        $date = $this->route_params['date'];
+
+        echo json_encode(UserExpense::getExpenseMonthlySum($category, $date), JSON_UNESCAPED_UNICODE);
     }
 }

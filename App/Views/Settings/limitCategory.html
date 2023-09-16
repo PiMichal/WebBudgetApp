@@ -88,16 +88,21 @@
 			<form class="text-white" id="validation" method="post">
 				<h3>Settings</h3>
 				<hr>
-				<label for="choosePaymentMethod" class="form-label mb-3">Select the payment method to delete (at least one payment method must remain)</label>
-				<select class="form-select mb-2" id="choosePaymentMethod" name="payment_methods" required>
-					<option selected disabled>&rarr; Choose payment method &larr;</option>
-					{% for payment_methods in payment_methods %}
-						<option>{{ payment_methods.payment_methods }}</option>
+				<label for="inputCategory" class="form-label mb-3">Select the category in which you want to set a limit</label>
+
+				<select class="form-select" id="inputCategory" name="category" required>
+					<option selected disabled>&rarr; Choose category &larr;</option>
+					{% for category in category %}
+						<option>{{ category.expense_name }}</option>
 					{% endfor %}
 				</select>
+				<div class="my-3">
+					<label for="inputAmount" class="form-label">Amount</label>
+					<input type="number" step="1" class="form-control" id="inputAmount" name="limit" min="0" placeholder="0,00" required>
+				</div>
 				<div class="mb-3 text-center">
 					<button class="btn btn-danger col-md-4" type="submit" id="cancel" formaction="/settings/settings">Cancel</button>
-					<button class="btn btn-success col-md-4 mx-3" type="submit" formaction="/settings/removePaymentMethodInfo">Delete</button>
+					<button class="btn btn-success col-md-4 mx-3" type="submit" formaction="/settings/setLimitCategory">Set limit</button>
 				</div>
 			</form>
 		</main>
@@ -109,5 +114,6 @@
 {% block footer %}
 
 	<script src="/js/validation.js"></script>
+	<script src="/js/textLimit.js"></script>
 
 {% endblock %}

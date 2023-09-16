@@ -11,6 +11,9 @@ session_start();
 
 $router = new Core\Router();
 
+$router->add('api/limit/{category:[\wżźćńółęąśŻŹĆĄŚĘŁÓŃ ]+}', ['controller' => 'Expense', 'action' => 'limit']);
+$router->add('api/limitValue/{category:[\wżźćńółęąśŻŹĆĄŚĘŁÓŃ ]+}/{date:[0-9-]+}', ['controller' => 'Expense', 'action' => 'limitValue']);
+
 $router->add('', ['controller' => 'Login', 'action' => 'new']);
 $router->add('logout', ['controller' => 'Login', 'action' => 'destroy']);
 $router->add('password/reset/{token:[\da-f]+}', ['controller' => 'Password', 'action' => 'reset']);

@@ -102,7 +102,7 @@
 
 		</header>
 		<main class="container py-5">
-			<form class="bd-example text-white" method="post" id="formExpenses">
+			<form class="bd-example text-white" method="post" id="validation">
 				<h3>Add Expense</h3>
 				<hr>
 				{% if errors is not empty %}
@@ -113,35 +113,46 @@
 						{% endfor %}
 					</ul>
 				{% endif %}
+				<p><span class="fw-bold">Limit info:</span>
+					<span class="limitInfo">category required</span>
+				</p>
+				<p><span class="fw-bold">Limit value:</span> 
+					<span class="limitValue">category and date required</span>
+				</p>
+				<p><span class="fw-bold">Cash left:</span>
+					<span class="cashLeft">category, date and amount required</span>
+				</p>
+				<hr>
 				<div class="mb-3">
 					<label for="inputAmount" class="form-label">Amount</label>
-					<input type="number" step="0.01" class="form-control" id="inputAmount" name="amount" min="0" placeholder="0,00" required>
+					<input type="number" step="0.01" class="form-control my_select" id="inputAmount" name="amount" min="0" placeholder="0,00" required>
 				</div>
 				<div class="mb-3">
 					<label for="inputDate" class="form-label">Date</label>
-					<input type="date" class="form-control" id="inputDate" name="date_of_expense" value="{{ date_of_expense }}" required>
+					<input type="date" class="form-control my_select" id="inputDate" name="date_of_expense" value="{{ date_of_expense }}" required>
 				</div>
-
-				<label for="inputPaymentMethod" class="form-label mb-3">Payment method</label>
-
+				<div class="mb-3">
+				<label for="inputCategory" class="form-label">Category</label>
+				<select class="form-select my_select" id="inputCategory" name="expense_category_assigned_to_user_id" required>
+					<option selected disabled>&rarr; Choose category &larr;</option>
+					{% for category in category %}
+					<option>{{ category.expense_name}}</option>
+					{% endfor %}
+				</select>
+				</div>
+				<div class="mb-3">
+				<label for="inputPaymentMethod" class="form-label ">Payment method</label>
 				<select class="form-select" id="inputPaymentMethod" name="payment_method_assigned_to_user_id" required>
+					<option selected disabled>&rarr; Choose payment method &larr;</option>
 					{% for payment_methods in payment_methods %}
 					<option>{{ payment_methods.payment_methods }}</option>
 					{% endfor %}
 				</select>
-
-				<label for="inputCategory" class="form-label my-3">Category</label>
-
-				<select class="form-select" id="inputCategory" name="expense_category_assigned_to_user_id" value="{{ expense.expense_category_assigned_to_user_id }}" required>
-					{% for category in category %}
-					<option>{{ category.expense_name }}</option>
-					{% endfor %}
-				</select>
-
+				</div>
 				<div class="my-3">
 					<label for="text" class="form-label">Comment (optional)</label>
-					<input type="text" class="form-control" id="text" maxlength="100" placeholder="eg. sale of bicycles" name="expense_comment">
-					<span class="pull-right label label-default" id="count_message"></span>
+					<input type="text" class="form-control" id="comment_limit" maxlength="100" placeholder="eg. sale of bicycles" name="expense_comment">
+					<span class="pull-right label label-default" id="count_comment_limit"></span>
 				</div>
 
 				<div class="mb-3 text-center">
@@ -156,44 +167,8 @@
 
 {% block footer %}
 
-<script>
-
-	var text_max = 100;
-	$('#count_message').html('0 / ' + text_max);
-
-	$('#text').keyup(function () {
-		var text_length = $('#text').val().length;
-		var text_remaining = text_max - text_length;
-
-		$('#count_message').html(text_length + ' / ' + text_max);
-	});
-
-	$(document).ready(function () { /**
-     * Validate the form
-     */
-		$("#cancel").click(function () {
-			document.getElementById("inputAmount").required = false;
-			document.getElementById("inputDate").required = false;
-		})
-
-		$("#formExpenses").validate({
-			rules: {
-				income_comment: {
-					maxlength: 100
-				}
-			},
-
-			highlight: function (element, errorClass, validClass) {
-				$(element).addClass("is-invalid").removeClass("is-valid");
-			},
-			unhighlight: function (element, errorClass, validClass) {
-				$(element).addClass("is-valid").removeClass("is-invalid");
-			}
-
-		});
-	});
-</script>
-
-
+<script src="/js/limit.js"></script>
+<script src="/js/validation.js"></script>
+<script src="/js/textLimit.js"></script>
 
 {% endblock %}

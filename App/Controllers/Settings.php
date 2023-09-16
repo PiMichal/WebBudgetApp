@@ -53,13 +53,16 @@ class Settings extends Authenticated
 
     public function incomeSaveAction()
     {
+
         $new_category = ucfirst(strtolower($_POST["new_category"]));
 
         if (empty(UserIncome::categoryValidate($new_category))) {
+
             UserIncome::incomeAddCategory($new_category);
             Flash::addMessage('Category added');
             View::renderTemplate('Settings/settings.html', []);
         } else {
+
             Flash::addMessage('Category not added', Flash::WARNING);
             View::renderTemplate('Settings/incomeAdd.html', [
                 'errors' => UserIncome::categoryValidate($new_category),
@@ -155,6 +158,7 @@ class Settings extends Authenticated
 
     public function expenseRenameSaveAction()
     {
+
         $new_category = ucfirst(strtolower($_POST["new_category"]));
 
         if (empty(UserExpense::categoryValidate($new_category))) {
@@ -170,6 +174,22 @@ class Settings extends Authenticated
                 'category' => UserExpense::expenseCategory()
             ]);
         }
+    }
+
+    public function limitCategoryAction()
+    {
+        View::renderTemplate('Settings/limitCategory.html', [
+            'category' => UserExpense::expenseCategory()
+        ]);
+    }
+
+    public function setLimitCategoryAction()
+    {
+        UserExpense::expenseSetLimit();
+
+        Flash::addMessage("The limit for the category '$_POST[category]' has been set");
+        View::renderTemplate('Settings/settings.html', [
+        ]);
     }
 
     public function expenseDeleteAction()
@@ -220,7 +240,7 @@ class Settings extends Authenticated
             Flash::addMessage('Payment method not added', Flash::WARNING);
             View::renderTemplate('Settings/paymentMethodAdd.html', [
                 'errors' => UserExpense::categoryValidate($new_payment_method),
-                'category' => $_POST["new_payment_method"]
+                'payment_methods' => $_POST["new_payment_method"]
             ]);
         }
     }

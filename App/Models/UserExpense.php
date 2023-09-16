@@ -318,6 +318,73 @@ class UserExpense extends \Core\Model
       $stmt->execute();
    }
 
+   public static function expenseSetLimit()
+   {
+      $user = Auth::getUser();
+
+      $sql = "UPDATE expenses_category_assigned_to_users
+              SET preset_limit = :preset_limit
+              WHERE user_id = :user_id
+              AND
+              name = :category";
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+
+      $stmt->bindValue(':user_id', $user->id, PDO::PARAM_INT);
+      $stmt->bindValue(':preset_limit', $_POST['limit'], PDO::PARAM_INT);
+      $stmt->bindValue(':category', $_POST['category'], PDO::PARAM_STR);
+
+      $stmt->execute();
+   }
+
+   public static function getLimit($category)
+   {
+      $user = Auth::getUser();
+
+      $sql = "SELECT preset_limit
+              FROM expenses_category_assigned_to_users
+              WHERE user_id = :user_id
+              AND
+              name = :category";
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+
+      $stmt->bindValue(':user_id', $user->id, PDO::PARAM_INT);
+      $stmt->bindValue(':category', $category, PDO::PARAM_STR);
+
+      $stmt->execute();
+      $data = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+      return $data[0];
+   }
+
+   public static function getExpenseMonthlySum($category, $date)
+   {
+      $user = Auth::getUser();
+
+      $sql = "SELECT SUM(amount)
+              FROM expenses
+              WHERE user_id = :user_id
+              AND
+              expense_category_assigned_to_user_id = (SELECT id FROM expenses_category_assigned_to_users WHERE name = :expense_category_assigned_to_user_id AND user_id = :user_id)
+              AND MONTH(date_of_expense) = MONTH(:date)
+              AND YEAR(date_of_expense) = YEAR(:date)";
+
+      $db = static::getDB();
+      $stmt = $db->prepare($sql);
+
+      $stmt->bindValue(':user_id', $user->id, PDO::PARAM_INT);
+      $stmt->bindValue(':expense_category_assigned_to_user_id', $category, PDO::PARAM_STR);
+      $stmt->bindValue(':date', $date, PDO::PARAM_STR);
+
+      $stmt->execute();
+      $data = $stmt->fetchAll(PDO::FETCH_COLUMN);
+      
+      return (int) $data[0];
+   }
+
    public static function categoryDelete()
    {
       $user = Auth::getUser();
@@ -457,4 +524,5 @@ class UserExpense extends \Core\Model
    {
       return (date('Y-m-d'));
    }
+
 }

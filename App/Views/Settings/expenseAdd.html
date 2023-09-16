@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Home
+{% block title %}Settings
 {% endblock %}
 
 {% block body %}
@@ -85,26 +85,24 @@
 		</header>
 
 		<main class="container py-5">
-			<form class="text-white" method="post">
+			<form class="text-white" id="validation" method="post">
 				<h3>Settings</h3>
-                {% if errors is not empty %}
-				<h5 class="text-start">Errors:</h5>
-				<ul class="text-start">
-					{% for error in errors %}
-						<li>{{ error }}</li>
-					{% endfor %}
-				</ul>
+				{% if errors is not empty %}
+					<h5 class="text-start">Errors:</h5>
+					<ul class="text-start">
+						{% for error in errors %}
+							<li>{{ error }}</li>
+						{% endfor %}
+					</ul>
 				{% endif %}
 				<hr>
-                <div class="my-3">
-					<label for="category" class="form-label">Enter a new expense category</label>
-					<input id="category" type="text" class="form-control" placeholder="Enter a new category"
-						name="new_category" value="{{ category }}" maxlength="50" required>
-                    <span class="pull-right label label-default" id="count_message"></span>
+				<div class="my-3">
+					<label for="inputCategory" class="form-label">Enter a new expense category</label>
+					<input id="inputCategory" type="text" class="form-control" placeholder="Enter a new category" name="new_category" value="{{ category }}" maxlength="50" required>
+					<span class="pull-right label label-default" id="count_message"></span>
 				</div>
-                <div class="mb-3 text-center">
-					<button class="btn btn-danger col-md-4" type="submit" id="cancel"
-						formaction="/settings/settings">Cancel</button>
+				<div class="mb-3 text-center">
+					<button class="btn btn-danger col-md-4" type="submit" id="cancel" formaction="/settings/settings">Cancel</button>
 					<button class="btn btn-success col-md-4 mx-3" type="submit" formaction="/settings/expenseSave">Add</button>
 				</div>
 			</form>
@@ -116,25 +114,7 @@
 
 {% block footer %}
 
-<script>
-    var text_max = 50;
-	$('#count_message').html('0 / ' + text_max);
-
-	$('#category').keyup(function () {
-		var text_length = $('#category').val().length;
-		var text_remaining = text_max - text_length;
-
-		$('#count_message').html(text_length + ' / ' + text_max);
-	});
-
-  $(document).ready(function () { /**
-     * Validate the form
-     */
-     $("#cancel").click(function() {
-        document.getElementById("category").required = false;
-     })
-
-  });
-</script>
+	<script src="/js/validation.js"></script>
+	<script src="/js/textLimit.js"></script>
 
 {% endblock %}

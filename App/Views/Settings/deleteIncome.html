@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Home
+{% block title %}Settings
 {% endblock %}
 
 {% block body %}
@@ -85,16 +85,17 @@
 		</header>
 
 		<main class="container py-5">
-			<form class="text-white" method="post">
+			<form class="text-white" id="validation" method="post">
 				<h3>Settings</h3>
 				<hr>
-                <label for="inputCategory" class="form-label mb-3">Select a category to delete (At least one category must remain)</label>
-				<select class="form-select mb-5" id="inputCategory" name="income_name" required>
+				<label for="inputCategory" class="form-label mb-3">Select a category to delete (At least one category must remain)</label>
+				<select class="form-select mb-2" id="inputCategory" name="income_name" required>
+					<option selected disabled>&rarr; Choose category &larr;</option>
 					{% for category in category %}
-					<option >{{ category.income_name }}</option>
+						<option>{{ category.income_name }}</option>
 					{% endfor %}
 				</select>
-                <div class="mb-3 text-center">
+				<div class="mb-3 text-center">
 					<button class="btn btn-danger col-md-4" type="submit" id="cancel" formaction="/settings/settings">Cancel</button>
 					<button class="btn btn-success col-md-4 mx-3" type="submit" formaction="/settings/incomeDeleteInfo">Delete</button>
 				</div>
@@ -102,5 +103,11 @@
 		</main>
 
 	</body>
+
+{% endblock %}
+
+{% block footer %}
+
+	<script src="/js/validation.js"></script>
 
 {% endblock %}

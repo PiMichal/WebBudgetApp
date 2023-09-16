@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Home
+{% block title %}Setting
 {% endblock %}
 
 {% block body %}
@@ -88,13 +88,14 @@
 			<form class="text-white" method="post">
 				<h3>Settings</h3>
 				<hr>
-                <br>
-                <div class="my-3">
-                    <h4 class="text-center">Once the <span class="text-warning fw-bold">"{{ category }}"</span> category is removed, all expenses assigned to it will be permanently lost</h4>
+				<br>
+				<div class="my-3">
+					<h4 class="text-center">Once the
+						<span class="text-warning fw-bold">"{{ category }}"</span>
+						category is removed, all expenses assigned to it will be permanently lost</h4>
 				</div>
-                <div class="mb-3 text-center">
-					<button class="btn btn-success m-5" type="submit" id="cancel"
-						formaction="/settings/expenseDelete">Don't delete categories</button>
+				<div class="mb-3 text-center">
+					<button class="btn btn-success m-5" type="submit" id="cancel" formaction="/settings/expenseDelete">Don't delete categories</button>
 					<button class="btn btn-danger" type="submit" formaction="/settings/removeExpenseCategory" name="expense_name" value="{{ category }}">Yes, remove the category</button>
 				</div>
 			</form>

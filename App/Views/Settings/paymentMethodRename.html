@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Home
+{% block title %}Settings
 {% endblock %}
 
 {% block body %}
@@ -85,37 +85,32 @@
 		</header>
 
 		<main class="container py-5">
-			<form class="text-white" method="post">
+			<form class="text-white" id="validation" method="post">
 				<h3>Settings</h3>
 				{% if errors is not empty %}
-				<h5 class="text-start">Errors:</h5>
-				<ul class="text-start">
-					{% for error in errors %}
-						<li>{{ error }}</li>
-					{% endfor %}
-				</ul>
+					<h5 class="text-start">Errors:</h5>
+					<ul class="text-start">
+						{% for error in errors %}
+							<li>{{ error }}</li>
+						{% endfor %}
+					</ul>
 				{% endif %}
 				<hr>
-                <label for="inputCategory" class="form-label mb-3">Select the payment method to rename</label>
-	
-				<select class="form-select" id="inputCategory" name="payment_methods" required>
+				<label for="choosePaymentMethod" class="form-label mb-3">Select the payment method to rename</label>
+
+				<select class="form-select" id="choosePaymentMethod" name="payment_methods" required>
+					<option disabled selected>&rarr; Choose payment method &larr;</option>
 					{% for payment_methods in payment_methods %}
-					{% if selected_payment_methods == payment_methods.payment_methods %}
-					<option selected>{{ payment_methods.payment_methods }}</option>
-					{% else %}
-					<option >{{ payment_methods.payment_methods }}</option>
-					{% endif %}
+						<option>{{ payment_methods.payment_methods }}</option>
 					{% endfor %}
 				</select>
-                <div class="my-3">
-					<label for="category" class="form-label">Enter a new name</label>
-					<input id="category" type="text" class="form-control" placeholder="Enter a new name"
-						name="new_payment_method" maxlength="50" value="{{ new_payment_method }}" required>
-                    <span class="pull-right label label-default" id="count_message"></span>
+				<div class="my-3">
+					<label for="inputPaymentMethod" class="form-label">Enter a new name</label>
+					<input id="inputPaymentMethod" type="text" class="form-control" placeholder="Enter a new name" name="new_payment_method" maxlength="50" value="{{ new_payment_method }}" required>
+					<span class="pull-right label label-default" id="count_message"></span>
 				</div>
-                <div class="mb-3 text-center">
-					<button class="btn btn-danger col-md-4" type="submit" id="cancel"
-						formaction="/settings/settings">Cancel</button>
+				<div class="mb-3 text-center">
+					<button class="btn btn-danger col-md-4" type="submit" id="cancel" formaction="/settings/settings">Cancel</button>
 					<button class="btn btn-success col-md-4 mx-3" type="submit" formaction="/settings/paymentMethodRenameSave">Rename</button>
 				</div>
 			</form>
@@ -127,25 +122,7 @@
 
 {% block footer %}
 
-<script>
-    var text_max = 50;
-	$('#count_message').html('0 / ' + text_max);
-
-	$('#category').keyup(function () {
-		var text_length = $('#category').val().length;
-		var text_remaining = text_max - text_length;
-
-		$('#count_message').html(text_length + ' / ' + text_max);
-	});
-
-  $(document).ready(function () { /**
-     * Validate the form
-     */
-     $("#cancel").click(function() {
-        document.getElementById("category").required = false;
-     })
-
-  });
-</script>
+	<script src="/js/validation.js"></script>
+	<script src="/js/textLimit.js"></script>
 
 {% endblock %}
