@@ -35,9 +35,9 @@ const showLimitOfThisCategory = (limitValue, category) => {
     const textLimitValue = document.querySelector('.limitInfo');
     
     if (limitValue === 0) {
-        textLimitValue.innerText = `no limit has been set for the ${category} category.`;
+        textLimitValue.innerText = `No limit has been set for the ${category} category.`;
     } else {
-        textLimitValue.innerText = `you set the limit ${limitValue} PLN monthly for the ${category} category.`;
+        textLimitValue.innerText = `You set the limit ${limitValue} PLN monthly for the ${category} category.`;
     }
 }
 
@@ -47,7 +47,7 @@ const showMonthlyExpensesInThisCategory = (monthlyValue, category) => {
     if (monthlyValue === 0) {
         textMonthlyValue.innerText = `You did not spend any money for the ${category} category this month.`;
     } else {
-        textMonthlyValue.innerText = `you spent ${monthlyValue} PLN this month for the ${category} category.`;
+        textMonthlyValue.innerText = `You spent ${monthlyValue} PLN this month for the ${category} category.`;
     }
 }
 
