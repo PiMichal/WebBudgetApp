@@ -44,6 +44,8 @@ class Expense extends Authenticated
     public function limitValueAction()
     {
         $category = $this->route_params['category'];
+        $category = str_replace('_', ' ', $category);
+        
         $date = $this->route_params['date'];
 
         echo json_encode(UserExpense::getExpenseMonthlySum($category, $date), JSON_UNESCAPED_UNICODE);
